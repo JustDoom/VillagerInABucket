@@ -1,0 +1,35 @@
+modLoader = "javafml"
+loaderVersion = "[47,)"
+issueTrackerURL = "https://github.com/JustDoom/Axifier/issues"
+license = "MIT"
+
+[[mods]]
+modId = "villagerinabucket"
+version = "${version}"
+displayName = "Axifier"
+authors = "JustDoom"
+description = '''
+Collect their flesh without killing them! Cruelty free!
+'''
+logoFile = "logo-forge.png"
+
+[[dependencies.axifier]]
+modId = "forge"
+mandatory = true
+versionRange = "[47,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.axifier]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.20.1,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.axifier]]
+modId = "architectury"
+mandatory = true
+versionRange = "[9.1.12,)"
+ordering = "AFTER"
+side = "BOTH"

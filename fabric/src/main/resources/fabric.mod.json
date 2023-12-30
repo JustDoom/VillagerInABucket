@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "villagerinabucket",
+  "version": "${version}",
+  "name": "Axifier",
+  "description": "Collect their flesh without killing them! Cruelty free!",
+  "authors": [
+    "JustDoom"
+  ],
+  "contact": {
+    "sources": "https://github.com/JustDoom/Axifier",
+    "issues": "https://github.com/JustDoom/Axifier/issues"
+  },
+  "license": "MIT",
+  "icon": "assets/justneeded/logo-fabric.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.imjustdoom.villagerinabucket.fabric.VillagerInABucketFabric"
+    ]
+  },
+  "mixins": [
+    "villagerinabucket-common.mixins.json"
+  ],
+  "depends": {
+    "fabric": "*",
+    "minecraft": ">=1.20.1",
+    "architectury": ">=9.1.12"
+  }
+}
