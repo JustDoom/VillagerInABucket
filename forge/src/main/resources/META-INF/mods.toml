@@ -1,33 +1,33 @@
 modLoader = "javafml"
 loaderVersion = "[47,)"
-issueTrackerURL = "https://github.com/JustDoom/Axifier/issues"
+issueTrackerURL = "https://github.com/JustDoom/VillagerInABucket/issues"
 license = "MIT"
 
 [[mods]]
 modId = "villagerinabucket"
 version = "${version}"
-displayName = "Axifier"
+displayName = "Villager In A Bucket"
 authors = "JustDoom"
 description = '''
-Collect their flesh without killing them! Cruelty free!
+Pick them up in a bucket
 '''
-logoFile = "logo-forge.png"
+logoFile = "logo.png"
 
-[[dependencies.axifier]]
+[[dependencies.villagerinabucket]]
 modId = "forge"
 mandatory = true
 versionRange = "[47,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.axifier]]
+[[dependencies.villagerinabucket]]
 modId = "minecraft"
 mandatory = true
 versionRange = "[1.20.1,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.axifier]]
+[[dependencies.villagerinabucket]]
 modId = "architectury"
 mandatory = true
 versionRange = "[9.1.12,)"

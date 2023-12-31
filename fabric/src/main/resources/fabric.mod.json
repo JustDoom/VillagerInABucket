@@ -2,17 +2,17 @@
   "schemaVersion": 1,
   "id": "villagerinabucket",
   "version": "${version}",
-  "name": "Axifier",
-  "description": "Collect their flesh without killing them! Cruelty free!",
+  "name": "Villager In A Bucket",
+  "description": "Pick them up in a bucket",
   "authors": [
     "JustDoom"
   ],
   "contact": {
-    "sources": "https://github.com/JustDoom/Axifier",
-    "issues": "https://github.com/JustDoom/Axifier/issues"
+    "sources": "https://github.com/JustDoom/VillagerInABucket",
+    "issues": "https://github.com/JustDoom/VillagerInABucket/issues"
   },
   "license": "MIT",
-  "icon": "assets/justneeded/logo-fabric.png",
+  "icon": "logo.png",
   "environment": "*",
   "entrypoints": {
     "main": [
