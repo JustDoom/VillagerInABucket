@@ -34,7 +34,6 @@ public class VillagerBucket extends MobBucketItem {
         this.content = fluid;
     }
 
-    // TODO: make sure 2 block high area. also if villager has no tags (creative menu) make it give the villager the skin from the biome spawned in
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
@@ -77,6 +76,9 @@ public class VillagerBucket extends MobBucketItem {
             if (data.contains("profession")) {
                 String profession = I18n.get("entity.minecraft.villager." + data.getString("profession").split(":")[1]);
                 list.add(Component.translatable("Profession: " + profession).withStyle(chatFormattings));
+            }
+            if (compoundTag.contains("Age") && compoundTag.getInt("Age") < 0) {
+                list.add(Component.literal("Baby").withStyle(chatFormattings));
             }
         }
     }
