@@ -15,7 +15,7 @@ public class ModItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(VillagerInABucket.MOD_ID, Registries.ITEM);
 
     public static final RegistrySupplier<VillagerBucket> VILLAGER_IN_A_BUCKET = ITEMS.register("villager_in_a_bucket", () ->
-            new VillagerBucket(EntityType.VILLAGER, Fluids.WATER, SoundEvents.VILLAGER_TRADE, new Item.Properties().stacksTo(1).arch$tab(VillagerInABucket.VILLAGERINABUCKET_TAB)));
+            new VillagerBucket(EntityType.VILLAGER, SoundEvents.VILLAGER_TRADE, new Item.Properties().stacksTo(1).arch$tab(VillagerInABucket.VILLAGERINABUCKET_TAB)));
 
     public static void init() {
         ITEMS.register();

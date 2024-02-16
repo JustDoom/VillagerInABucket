@@ -16,6 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.MobBucketItem;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
@@ -27,17 +28,14 @@ import java.util.List;
 
 public class VillagerBucket extends MobBucketItem {
 
-    private final Fluid content;
-
-    public VillagerBucket(EntityType<?> entityType, Fluid fluid, SoundEvent soundEvent, Properties properties) {
-        super(entityType, fluid, soundEvent, properties);
-        this.content = fluid;
+    public VillagerBucket(EntityType<?> entityType, SoundEvent soundEvent, Properties properties) {
+        super(entityType, Fluids.EMPTY, soundEvent, properties);
     }
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
-        BlockHitResult blockHitResult = getPlayerPOVHitResult(level, player, this.content == Fluids.EMPTY ? net.minecraft.world.level.ClipContext.Fluid.SOURCE_ONLY : net.minecraft.world.level.ClipContext.Fluid.NONE);
+        BlockHitResult blockHitResult = getPlayerPOVHitResult(level, player, ClipContext.Fluid.NONE);
         if (blockHitResult.getType() == HitResult.Type.MISS) {
             return InteractionResultHolder.pass(itemStack);
         } else if (blockHitResult.getType() != HitResult.Type.BLOCK) {
@@ -45,7 +43,7 @@ public class VillagerBucket extends MobBucketItem {
         } else {
             BlockPos blockPos = blockHitResult.getBlockPos();
             if (level.mayInteract(player, blockPos)) {
-                this.checkExtraContent(player, level, itemStack, blockPos);
+                checkExtraContent(player, level, itemStack, blockPos);
                 if (player instanceof ServerPlayer) {
                     CriteriaTriggers.PLACED_BLOCK.trigger((ServerPlayer) player, blockPos, itemStack);
                 }
@@ -61,25 +59,27 @@ public class VillagerBucket extends MobBucketItem {
     @Override
     public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag) {
         CompoundTag compoundTag = itemStack.getTag();
-        if (compoundTag != null) {
-            ChatFormatting[] chatFormattings = new ChatFormatting[]{ChatFormatting.ITALIC, ChatFormatting.GRAY};
+        if (compoundTag == null) {
+            return;
+        }
 
-            CompoundTag data = compoundTag.getCompound("VillagerData");
+        ChatFormatting[] chatFormattings = new ChatFormatting[]{ChatFormatting.ITALIC, ChatFormatting.GRAY};
 
-            if (data.contains("level")) {
-                list.add(Component.translatable("Level: " + data.getInt("level")).withStyle(chatFormattings));
-            }
-            if (data.contains("type")) {
-                String region = I18n.get("biome.minecraft." + data.getString("type").split(":")[1]);
-                list.add(Component.translatable("Region: " + region).withStyle(chatFormattings));
-            }
-            if (data.contains("profession")) {
-                String profession = I18n.get("entity.minecraft.villager." + data.getString("profession").split(":")[1]);
-                list.add(Component.translatable("Profession: " + profession).withStyle(chatFormattings));
-            }
-            if (compoundTag.contains("Age") && compoundTag.getInt("Age") < 0) {
-                list.add(Component.literal("Baby").withStyle(chatFormattings));
-            }
+        CompoundTag data = compoundTag.getCompound("VillagerData");
+
+        if (data.contains("level")) {
+            list.add(Component.translatable("Level: " + data.getInt("level")).withStyle(chatFormattings));
+        }
+        if (data.contains("type")) {
+            String region = I18n.get("biome.minecraft." + data.getString("type").split(":")[1]);
+            list.add(Component.translatable("Region: " + region).withStyle(chatFormattings));
+        }
+        if (data.contains("profession")) {
+            String profession = I18n.get("entity.minecraft.villager." + data.getString("profession").split(":")[1]);
+            list.add(Component.translatable("Profession: " + profession).withStyle(chatFormattings));
+        }
+        if (compoundTag.contains("Age") && compoundTag.getInt("Age") < 0) {
+            list.add(Component.literal("Baby").withStyle(chatFormattings));
         }
     }
 }
