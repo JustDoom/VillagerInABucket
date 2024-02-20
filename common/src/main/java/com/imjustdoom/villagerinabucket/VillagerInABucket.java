@@ -16,10 +16,14 @@ public class VillagerInABucket {
 
     public static final RegistrySupplier<CreativeModeTab> VILLAGERINABUCKET_TAB = TABS.register(
             "villagerinabucket_tab",
-            () -> CreativeTabRegistry.create(
-                    Component.translatable("category.villagerinabucket.villagerinabucket_tab"),
-                    () -> new ItemStack(ModItems.VILLAGER_IN_A_BUCKET.get())
-            )
+            () -> {
+                CreativeModeTab tab = CreativeTabRegistry.create(
+                        Component.translatable("category.villagerinabucket.villagerinabucket_tab"),
+                        () -> new ItemStack(ModItems.VILLAGER_IN_A_BUCKET.get())
+                );
+
+                return tab;
+            }
     );
 
     public static void init() {

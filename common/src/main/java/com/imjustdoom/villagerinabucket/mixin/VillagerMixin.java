@@ -12,7 +12,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Bucketable;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.npc.Villager;
@@ -47,6 +46,20 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
         playSound(getPickupSound(), 1.0F, 1.0F);
         ItemStack villagerBucket = getBucketItemStack();
         saveToBucketTag(villagerBucket);
+
+        CompoundTag tag = villagerBucket.getOrCreateTag();
+        if (tag.getCompound("VillagerData").contains("type")) {
+            String type = tag.getCompound("VillagerData").getString("type").split(":")[1];
+            if (type.equals("desert")) {
+                tag.putInt("CustomModelData", 1);
+            } else if (type.equals("savanna")) {
+                tag.putInt("CustomModelData", 2);
+            } else if (type.equals("snow")) {
+                tag.putInt("CustomModelData", 3);
+            } else if (type.equals("swamp")) {
+                tag.putInt("CustomModelData", 4);
+            }
+        }
         player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, villagerBucket, false));
         if (!level().isClientSide()) {
             CriteriaTriggers.FILLED_BUCKET.trigger((ServerPlayer) player, getBucketItemStack());
