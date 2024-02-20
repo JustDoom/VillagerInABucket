@@ -62,8 +62,6 @@ public class VillagerBucket extends MobBucketItem {
             return;
         }
 
-        System.out.println(compoundTag);
-
         ChatFormatting[] chatFormattings = new ChatFormatting[]{ChatFormatting.ITALIC, ChatFormatting.GRAY};
 
         CompoundTag data = compoundTag.getCompound("VillagerData");
