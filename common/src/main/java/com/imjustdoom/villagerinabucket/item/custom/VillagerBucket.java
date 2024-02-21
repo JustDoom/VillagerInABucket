@@ -46,7 +46,7 @@ public class VillagerBucket extends MobBucketItem {
                 if (player instanceof ServerPlayer) {
                     CriteriaTriggers.PLACED_BLOCK.trigger((ServerPlayer) player, blockPos, itemStack);
                 }
-
+// TODO: Try make bucket with no nbt make villager type the same as biome spawned in
                 player.awardStat(Stats.ITEM_USED.get(this));
                 return InteractionResultHolder.sidedSuccess(getEmptySuccessItem(itemStack, player), level.isClientSide());
             } else {
@@ -70,7 +70,8 @@ public class VillagerBucket extends MobBucketItem {
             list.add(Component.translatable("Level: " + data.getInt("level")).withStyle(chatFormattings));
         }
         if (data.contains("type")) {
-            String region = I18n.get("biome.minecraft." + data.getString("type").split(":")[1]);
+            String type = data.getString("type").split(":")[1];
+            String region = I18n.get((type.equals("snow") ? "block.minecraft.snow" : "biome.minecraft." + type));
             list.add(Component.translatable("Region: " + region).withStyle(chatFormattings));
         }
         if (data.contains("profession")) {
