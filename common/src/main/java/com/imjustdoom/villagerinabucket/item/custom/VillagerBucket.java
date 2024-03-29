@@ -56,7 +56,7 @@ public class VillagerBucket extends MobBucketItem {
                 if (player instanceof ServerPlayer) {
                     CriteriaTriggers.PLACED_BLOCK.trigger((ServerPlayer) player, blockPos, itemStack);
                 }
-// TODO: Try make bucket with no nbt make villager type the same as biome spawned in
+                // TODO: Try make bucket with no nbt make villager type the same as biome spawned in
                 player.awardStat(Stats.ITEM_USED.get(this));
                 return InteractionResultHolder.sidedSuccess(getEmptySuccessItem(itemStack, player), level.isClientSide());
             } else {
