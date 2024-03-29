@@ -7,5 +7,6 @@ public class VillagerInABucketFabric implements ModInitializer {
     @Override
     public void onInitialize() {
         VillagerInABucket.init();
+        VillagerInABucket.registerDispenserBehaviours();
     }
 }

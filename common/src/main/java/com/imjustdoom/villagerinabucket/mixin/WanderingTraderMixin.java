@@ -1,5 +1,6 @@
 package com.imjustdoom.villagerinabucket.mixin;
 
+import com.imjustdoom.villagerinabucket.VillagerBucketable;
 import com.imjustdoom.villagerinabucket.item.ModItems;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.nbt.CompoundTag;
@@ -22,13 +23,14 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(WanderingTrader.class)
-public abstract class WanderingTraderMixin extends AbstractVillager implements Bucketable {
+public abstract class WanderingTraderMixin extends AbstractVillager implements Bucketable, VillagerBucketable {
 
     private static final EntityDataAccessor<Boolean> FROM_BUCKET;
 
@@ -44,15 +46,22 @@ public abstract class WanderingTraderMixin extends AbstractVillager implements B
         }
 
         playSound(getPickupSound(), 1.0F, 1.0F);
-        ItemStack villagerBucket = getBucketItemStack();
-        saveToBucketTag(villagerBucket);
-        player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, villagerBucket, false));
+
+        player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, createBucketStack(), false));
         if (!level().isClientSide()) {
             CriteriaTriggers.FILLED_BUCKET.trigger((ServerPlayer) player, getBucketItemStack());
         }
 
         discard();
         cir.setReturnValue(InteractionResult.sidedSuccess(level().isClientSide()));
+    }
+
+    @Override
+    public ItemStack createBucketStack() {
+        ItemStack villagerBucket = getBucketItemStack();
+        saveToBucketTag(villagerBucket);
+
+        return villagerBucket;
     }
 
     @Override

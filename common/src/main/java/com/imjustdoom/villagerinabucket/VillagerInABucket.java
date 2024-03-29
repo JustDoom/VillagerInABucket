@@ -5,6 +5,11 @@ import com.mojang.serialization.DataResult;
 import dev.architectury.registry.CreativeTabRegistry;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.BlockSource;
+import net.minecraft.core.Direction;
+import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
+import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -14,8 +19,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.npc.VillagerType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.DispensibleContainerItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.DispenserBlock;
+import net.minecraft.world.phys.BlockHitResult;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -63,5 +74,26 @@ public class VillagerInABucket {
         TABS.register();
 
         ModItems.init();
+    }
+
+    public static void registerDispenserBehaviours() {
+        DispenseItemBehavior dispenseItemBehavior = new DefaultDispenseItemBehavior() {
+            private final DefaultDispenseItemBehavior defaultDispenseItemBehavior = new DefaultDispenseItemBehavior();
+
+            public ItemStack execute(BlockSource blockSource, ItemStack itemStack) {
+                DispensibleContainerItem dispensibleContainerItem = (DispensibleContainerItem) itemStack.getItem();
+                BlockPos blockPos = blockSource.getPos().relative(blockSource.getBlockState().getValue(DispenserBlock.FACING));
+                Level level = blockSource.getLevel();
+                if (dispensibleContainerItem.emptyContents(null, level, blockPos, null)) {
+                    dispensibleContainerItem.checkExtraContent(null, level, itemStack, blockPos);
+                    return new ItemStack(Items.BUCKET);
+                } else {
+                    return this.defaultDispenseItemBehavior.dispense(blockSource, itemStack);
+                }
+            }
+        };
+
+        DispenserBlock.registerBehavior(ModItems.VILLAGER_IN_A_BUCKET.get(), dispenseItemBehavior);
+        DispenserBlock.registerBehavior(ModItems.WANDERING_TRADER_IN_A_BUCKET.get(), dispenseItemBehavior);
     }
 }
