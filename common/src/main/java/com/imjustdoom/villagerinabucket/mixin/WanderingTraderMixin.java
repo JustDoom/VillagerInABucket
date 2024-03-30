@@ -48,12 +48,12 @@ public abstract class WanderingTraderMixin extends AbstractVillager implements B
         playSound(getPickupSound(), 1.0F, 1.0F);
 
         player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, createBucketStack(), false));
-        if (!level().isClientSide()) {
+        if (!level.isClientSide()) {
             CriteriaTriggers.FILLED_BUCKET.trigger((ServerPlayer) player, getBucketItemStack());
         }
 
         discard();
-        cir.setReturnValue(InteractionResult.sidedSuccess(level().isClientSide()));
+        cir.setReturnValue(InteractionResult.sidedSuccess(level.isClientSide()));
     }
 
     @Override
