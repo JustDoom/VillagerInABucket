@@ -106,7 +106,7 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
 
     @Override
     public @NotNull ItemStack getBucketItemStack() {
-        return new ItemStack(ModItems.VILLAGER_IN_A_BUCKET.get());
+        return new ItemStack(ModItems.VILLAGER_IN_A_BUCKET);
     }
 
     @Override
