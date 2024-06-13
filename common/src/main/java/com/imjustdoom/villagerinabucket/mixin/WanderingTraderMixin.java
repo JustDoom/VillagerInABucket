@@ -89,7 +89,7 @@ public abstract class WanderingTraderMixin extends AbstractVillager implements B
 
     @Override
     public @NotNull ItemStack getBucketItemStack() {
-        return new ItemStack(ModItems.WANDERING_TRADER_IN_A_BUCKET.get());
+        return new ItemStack(ModItems.WANDERING_TRADER_IN_A_BUCKET);
     }
 
     @Override
