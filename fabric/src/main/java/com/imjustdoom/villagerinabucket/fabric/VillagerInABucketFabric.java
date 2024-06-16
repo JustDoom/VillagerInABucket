@@ -2,21 +2,27 @@ package com.imjustdoom.villagerinabucket.fabric;
 
 import com.imjustdoom.villagerinabucket.VillagerInABucket;
 import com.imjustdoom.villagerinabucket.item.ModItems;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.npc.VillagerType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.CustomModelData;
 
 public class VillagerInABucketFabric implements ModInitializer {
 
@@ -31,16 +37,18 @@ public class VillagerInABucketFabric implements ModInitializer {
 
                 for (VillagerType type : BuiltInRegistries.VILLAGER_TYPE) {
                     ItemStack itemStack = new ItemStack(ModItems.VILLAGER_IN_A_BUCKET);
-                    CompoundTag compoundTag = itemStack.getOrCreateTag();
+//                    CustomData customData = itemStack.getOrDefault(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY);
 
                     if (VillagerInABucket.VILLAGER_DATA_LIST.containsKey(type)) {
-                        compoundTag.putInt("CustomModelData", VillagerInABucket.VILLAGER_DATA_LIST.get(type));
+                        itemStack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(VillagerInABucket.VILLAGER_DATA_LIST.get(type)));
+//                        compoundTag.putInt("CustomModelData", );
                     }
 
                     VillagerData villagerData = new VillagerData(type, VillagerProfession.NONE, 0);
                     DataResult<Tag> data = VillagerData.CODEC.encodeStart(NbtOps.INSTANCE, villagerData);
 
-                    data.resultOrPartial(s -> System.out.println("Oh no something happened, no idea how or what the consequences are. Contact Villager In A Bucket support though")).ifPresent(tag -> compoundTag.put("VillagerData", tag));
+                    data.resultOrPartial(s -> System.out.println("Oh no something happened, no idea how or what the consequences are. Contact Villager In A Bucket support though"))
+                            .ifPresent(tag -> CustomData.update(DataComponents.BUCKET_ENTITY_DATA, itemStack, compoundTag -> compoundTag.put("VillagerData", tag)));
                     output.accept(itemStack);
                 }
             })

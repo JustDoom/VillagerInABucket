@@ -3,6 +3,7 @@ package com.imjustdoom.villagerinabucket.mixin;
 import com.imjustdoom.villagerinabucket.VillagerBucketable;
 import com.imjustdoom.villagerinabucket.item.ModItems;
 import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -20,6 +21,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
@@ -77,7 +79,7 @@ public abstract class WanderingTraderMixin extends AbstractVillager implements B
 
     @Override
     public void saveToBucketTag(ItemStack itemStack) {
-        addAdditionalSaveData(itemStack.getOrCreateTag());
+        CustomData.update(DataComponents.BUCKET_ENTITY_DATA, itemStack, this::addAdditionalSaveData);
         Bucketable.saveDefaultDataToBucketTag(this, itemStack);
     }
 

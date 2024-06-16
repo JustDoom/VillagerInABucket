@@ -1,4 +1,4 @@
-package com.imjustdoom.villagerinabucket.forge;
+package com.imjustdoom.villagerinabucket.neoforge;
 
 import com.imjustdoom.villagerinabucket.VillagerInABucket;
 import com.imjustdoom.villagerinabucket.item.ModItems;

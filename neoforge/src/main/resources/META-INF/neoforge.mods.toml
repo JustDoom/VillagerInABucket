@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[48,)"
+loaderVersion = "[2,)"
 issueTrackerURL = "https://github.com/JustDoom/VillagerInABucket/issues"
 license = "MIT"
 
@@ -16,13 +16,16 @@ logoFile = "logo.png"
 [[dependencies.villagerinabucket]]
 modId = "forge"
 mandatory = true
-versionRange = "[48,)"
+versionRange = "[2,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.villagerinabucket]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.20.2,)"
+versionRange = "[1.20.6,)"
 ordering = "NONE"
 side = "BOTH"
+
+[[mixins]]
+config = "villagerinabucket-common.mixins.json"

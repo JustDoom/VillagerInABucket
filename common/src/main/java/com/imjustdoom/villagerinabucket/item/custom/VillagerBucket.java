@@ -1,10 +1,11 @@
 package com.imjustdoom.villagerinabucket.item.custom;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -12,10 +13,13 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.MobBucketItem;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -25,8 +29,11 @@ import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
 public class VillagerBucket extends MobBucketItem {
+
+    private static final MapCodec<VillagerData> CODEC;
 
     public VillagerBucket(EntityType<?> entityType, SoundEvent soundEvent, Properties properties) {
         super(entityType, Fluids.EMPTY, soundEvent, properties);
@@ -57,30 +64,38 @@ public class VillagerBucket extends MobBucketItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag) {
-        CompoundTag compoundTag = itemStack.getTag();
-        if (compoundTag == null) {
+    public void appendHoverText(ItemStack itemStack, Item.TooltipContext tooltipContext, List<Component> list, TooltipFlag tooltipFlag) {
+        CustomData customData = itemStack.getOrDefault(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY);
+        if (customData.isEmpty()) {
             return;
         }
 
-        ChatFormatting[] chatFormattings = new ChatFormatting[]{ChatFormatting.ITALIC, ChatFormatting.GRAY};
+//        CompoundTag data = compoundTag.getCompound("VillagerData");
+        System.out.println(customData.toString());
+        Optional<VillagerData> optional = customData.read(CODEC).result();
 
-        CompoundTag data = compoundTag.getCompound("VillagerData");
+        if (optional.isPresent()) {
+            VillagerData data = optional.get();
+            ChatFormatting[] chatFormattings = new ChatFormatting[]{ChatFormatting.ITALIC, ChatFormatting.GRAY};
 
-        if (data.contains("level")) {
-            list.add(Component.translatable("Level: " + data.getInt("level")).withStyle(chatFormattings));
-        }
-        if (data.contains("type")) {
-            String type = data.getString("type").split(":")[1];
+//            if (data.contains("level")) {
+                list.add(Component.translatable("Level: " + data.getLevel()).withStyle(chatFormattings));
+//            }
+//
+//        if (data.contains("type")) {
+            String type = data.getType().toString(); //.toString().split(":")[1];
             String region = I18n.get((type.equals("snow") ? "block.minecraft.snow" : "biome.minecraft." + type));
             list.add(Component.translatable("Region: " + region).withStyle(chatFormattings));
-        }
-        if (data.contains("profession")) {
-            String profession = I18n.get("entity.minecraft.villager." + data.getString("profession").split(":")[1]);
+//        }
+//
+//        if (data.contains("profession")) {
+            String profession = I18n.get("entity.minecraft.villager." + data.getProfession().toString());//.split(":")[1]);
             list.add(Component.translatable("Profession: " + profession).withStyle(chatFormattings));
-        }
-        if (compoundTag.contains("Age") && compoundTag.getInt("Age") < 0) {
-            list.add(Component.literal("Baby").withStyle(chatFormattings));
+//        }
+//
+//        if (compoundTag.getInt("Age") < 0) {
+//            list.add(Component.literal("Baby").withStyle(chatFormattings));
+//        }
         }
     }
 
@@ -93,5 +108,9 @@ public class VillagerBucket extends MobBucketItem {
         } else {
             return false;
         }
+    }
+
+    static {
+        CODEC = VillagerData.CODEC.fieldOf("VillagerData");
     }
 }
