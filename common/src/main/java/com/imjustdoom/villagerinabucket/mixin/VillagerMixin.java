@@ -7,6 +7,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -16,6 +17,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.Bucketable;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
@@ -30,10 +32,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-@Mixin(Villager.class)
+@Mixin({Villager.class, WanderingTrader.class})
 public abstract class VillagerMixin extends AbstractVillager implements Bucketable, VillagerBucketable {
 
-    @Shadow public abstract void readAdditionalSaveData(CompoundTag arg);
+    @Shadow(remap = false) public abstract void readAdditionalSaveData(CompoundTag arg);
+    @Shadow(remap = false) public abstract void addAdditionalSaveData(CompoundTag arg);
 
     private static final EntityDataAccessor<Boolean> FROM_BUCKET;
 
@@ -65,6 +68,8 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
         saveToBucketTag(villagerBucket);
 
         CompoundTag tag = villagerBucket.getOrCreateTag();
+        ResourceLocation resourceLocation = EntityType.getKey(getType());
+        tag.putString("type", resourceLocation.getNamespace() + ":" + resourceLocation.getPath());
         if (tag.getCompound("VillagerData").contains("type")) {
             String type = tag.getCompound("VillagerData").getString("type").split(":")[1];
             if (type.equals("desert")) {
@@ -106,6 +111,12 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
 
     @Override
     public @NotNull ItemStack getBucketItemStack() {
+        if (((AbstractVillager) this) instanceof Villager) {
+            return new ItemStack(ModItems.VILLAGER_IN_A_BUCKET);
+        } else if (((AbstractVillager) this) instanceof WanderingTrader) {
+            return new ItemStack(ModItems.WANDERING_TRADER_IN_A_BUCKET);
+        }
+
         return new ItemStack(ModItems.VILLAGER_IN_A_BUCKET);
     }
 
