@@ -5,8 +5,7 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "DispenseBucketBehaviorMixin",
-    "VillagerMixin",
-    "WanderingTraderMixin"
+    "VillagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
