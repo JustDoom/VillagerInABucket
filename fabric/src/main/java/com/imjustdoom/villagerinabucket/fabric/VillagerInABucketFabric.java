@@ -37,11 +37,9 @@ public class VillagerInABucketFabric implements ModInitializer {
 
                 for (VillagerType type : BuiltInRegistries.VILLAGER_TYPE) {
                     ItemStack itemStack = new ItemStack(ModItems.VILLAGER_IN_A_BUCKET);
-//                    CustomData customData = itemStack.getOrDefault(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY);
 
                     if (VillagerInABucket.VILLAGER_DATA_LIST.containsKey(type)) {
                         itemStack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(VillagerInABucket.VILLAGER_DATA_LIST.get(type)));
-//                        compoundTag.putInt("CustomModelData", );
                     }
 
                     VillagerData villagerData = new VillagerData(type, VillagerProfession.NONE, 0);

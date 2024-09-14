@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "villagerinabucket:villager_in_a_bucket"
+      "id": "villagerinabucket:villager_in_a_bucket"
     },
     "title": "No You Get in the Bucket",
     "description": "Capture a Villager inside a bucket",

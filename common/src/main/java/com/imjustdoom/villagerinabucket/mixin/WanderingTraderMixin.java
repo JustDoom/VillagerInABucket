@@ -34,7 +34,8 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(WanderingTrader.class)
 public abstract class WanderingTraderMixin extends AbstractVillager implements Bucketable, VillagerBucketable {
 
-    private static final EntityDataAccessor<Boolean> FROM_BUCKET;
+    @Unique
+    private static final EntityDataAccessor<Boolean> FROM_BUCKET = SynchedEntityData.defineId(WanderingTraderMixin.class, EntityDataSerializers.BOOLEAN);
 
     public WanderingTraderMixin(EntityType<? extends AbstractVillager> entityType, Level level) {
         super(entityType, level);
@@ -67,14 +68,31 @@ public abstract class WanderingTraderMixin extends AbstractVillager implements B
     }
 
     @Override
+    public void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(FROM_BUCKET, false);
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag compound) {
+        super.addAdditionalSaveData(compound);
+        compound.putBoolean("FromBucket", this.fromBucket());
+    }
+
+    @Override
+    public void readAdditionalSaveData(CompoundTag compound) {
+        super.readAdditionalSaveData(compound);
+        this.setFromBucket(compound.getBoolean("FromBucket"));
+    }
+
+    @Override
     public boolean fromBucket() {
         return getEntityData().get(FROM_BUCKET);
     }
 
     @Override
-    public void setFromBucket(boolean bl) {
-        // this makes errors, do we need it?
-//        ((Villager)(Object) this).getEntityData().set(FROM_BUCKET, bl);
+    public void setFromBucket(boolean fromBucket) {
+        getEntityData().set(FROM_BUCKET, fromBucket);
     }
 
     @Override
@@ -97,9 +115,5 @@ public abstract class WanderingTraderMixin extends AbstractVillager implements B
     @Override
     public @NotNull SoundEvent getPickupSound() {
         return SoundEvents.VILLAGER_TRADE;
-    }
-
-    static {
-        FROM_BUCKET = SynchedEntityData.defineId(WanderingTrader.class, EntityDataSerializers.BOOLEAN);
     }
 }

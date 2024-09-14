@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "villagerinabucket:wandering_trader_in_a_bucket"
+      "id": "villagerinabucket:wandering_trader_in_a_bucket"
     },
     "title": "I 'Wander' What the Inside of a PokeBall Looks Like",
     "description": "Capture a Wandering Trader inside a bucket",

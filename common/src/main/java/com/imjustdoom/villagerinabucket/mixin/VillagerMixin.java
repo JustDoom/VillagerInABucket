@@ -2,6 +2,7 @@ package com.imjustdoom.villagerinabucket.mixin;
 
 import com.imjustdoom.villagerinabucket.VillagerBucketable;
 import com.imjustdoom.villagerinabucket.item.ModItems;
+import com.imjustdoom.villagerinabucket.item.custom.VillagerBucket;
 import com.mojang.serialization.Codec;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.component.DataComponents;
@@ -35,6 +36,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -43,12 +45,8 @@ import java.util.Optional;
 @Mixin(Villager.class)
 public abstract class VillagerMixin extends AbstractVillager implements Bucketable, VillagerBucketable {
 
-//    @Shadow public abstract void readAdditionalSaveData(CompoundTag arg);
-//
-//    @Shadow public abstract void addAdditionalSaveData(CompoundTag compoundTag);
-
-//    @Unique
-//    private static final EntityDataAccessor<Boolean> FROM_BUCKET = SynchedEntityData.defineId(VillagerMixin.class, EntityDataSerializers.BOOLEAN);
+    @Unique
+    private static final EntityDataAccessor<Boolean> FROM_BUCKET = SynchedEntityData.defineId(VillagerMixin.class, EntityDataSerializers.BOOLEAN);
 
     public VillagerMixin(EntityType<? extends AbstractVillager> entityType, Level level) {
         super(entityType, level);
@@ -77,46 +75,51 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
         ItemStack villagerBucket = getBucketItemStack();
         saveToBucketTag(villagerBucket);
 
-        CustomData customData = (CustomData) villagerBucket.getOrDefault(DataComponents.CUSTOM_MODEL_DATA, CustomData.EMPTY);
+        CustomData customData = villagerBucket.getOrDefault(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY);
         if (customData.isEmpty()) {
             return villagerBucket;
         }
 
-        Optional<CustomModelData> optional = customData.read(CustomData.CODEC).result();
-
-//        CompoundTag tag = villagerBucket.getOrCreateTag();
-//        if (tag.getCompound("VillagerData").contains("type")) {
-//            String type = tag.getCompound("VillagerData").getString("type").split(":")[1];
-//            if (type.equals("desert")) {
-//                tag.putInt("CustomModelData", 1);
-//            } else if (type.equals("savanna")) {
-//                tag.putInt("CustomModelData", 2);
-//            } else if (type.equals("snow")) {
-//                tag.putInt("CustomModelData", 3);
-//            } else if (type.equals("swamp")) {
-//                tag.putInt("CustomModelData", 4);
-//            }
-//        }
+        Optional<VillagerData> optional = customData.read(VillagerBucket.CODEC).result();
+        if (optional.isPresent()) {
+            VillagerData data = optional.get();
+            String type = data.getType().toString();
+            switch (type) {
+                case "desert" -> villagerBucket.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(1));
+                case "savanna" -> villagerBucket.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(2));
+                case "snow" -> villagerBucket.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(3));
+                case "swamp" -> villagerBucket.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(4));
+            }
+        }
 
         return villagerBucket;
     }
 
-    @Override
-    public void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-//        builder.define(FROM_BUCKET, false);
+    @Inject(at = @At("HEAD"), method = "defineSynchedData")
+    public void defineSynchedData(SynchedEntityData.Builder builder, CallbackInfo ci) {
+        builder.define(FROM_BUCKET, false);
+    }
+
+    @Inject(at = @At("HEAD"), method = "addAdditionalSaveData")
+    public void addAdditionalSaveData(CompoundTag compound, CallbackInfo ci) {
+        super.addAdditionalSaveData(compound);
+        compound.putBoolean("FromBucket", this.fromBucket());
+    }
+
+    @Inject(at = @At("HEAD"), method = "readAdditionalSaveData")
+    public void readAdditionalSaveData(CompoundTag compound, CallbackInfo ci) {
+        super.readAdditionalSaveData(compound);
+        this.setFromBucket(compound.getBoolean("FromBucket"));
     }
 
     @Override
     public boolean fromBucket() {
-        return false;
-//        return getEntityData().get(FROM_BUCKET);
+        return getEntityData().get(FROM_BUCKET);
     }
-//
+
     @Override
-    public void setFromBucket(boolean bl) {
-//         this makes errors, do we need it?
-//        getEntityData().set(FROM_BUCKET, bl);
+    public void setFromBucket(boolean fromBucket) {
+        getEntityData().set(FROM_BUCKET, fromBucket);
     }
 
     @Override
@@ -139,17 +142,5 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
     @Override
     public @NotNull SoundEvent getPickupSound() {
         return SoundEvents.VILLAGER_TRADE;
-    }
-
-    @Override
-    public void addAdditionalSaveData(CompoundTag compoundTag) {
-        super.addAdditionalSaveData(compoundTag);
-        compoundTag.putBoolean("FromBucket", this.fromBucket());
-    }
-
-    @Override
-    public void readAdditionalSaveData(CompoundTag compoundTag) {
-        super.readAdditionalSaveData(compoundTag);
-        this.setFromBucket(compoundTag.getBoolean("FromBucket"));
     }
 }

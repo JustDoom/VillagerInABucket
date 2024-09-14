@@ -1,11 +1,13 @@
 package com.imjustdoom.villagerinabucket.item.custom;
 
 import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.MapDecoder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -26,6 +28,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -33,14 +36,14 @@ import java.util.Optional;
 
 public class VillagerBucket extends MobBucketItem {
 
-    private static final MapCodec<VillagerData> CODEC;
+    public static final MapCodec<VillagerData> CODEC;
 
     public VillagerBucket(EntityType<?> entityType, SoundEvent soundEvent, Properties properties) {
         super(entityType, Fluids.EMPTY, soundEvent, properties);
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
+    public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
         BlockHitResult blockHitResult = getPlayerPOVHitResult(level, player, ClipContext.Fluid.NONE);
         if (blockHitResult.getType() == HitResult.Type.MISS) {
@@ -50,6 +53,14 @@ public class VillagerBucket extends MobBucketItem {
         } else {
             BlockPos blockPos = blockHitResult.getBlockPos();
             if (level.mayInteract(player, blockPos)) {
+
+                if (itemStack.getOrDefault(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY).isEmpty()) {
+                    CustomData oldData = itemStack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+                    if (!oldData.isEmpty()) {
+                        oldData.read(CODEC).result().ifPresent(villagerData -> itemStack.set(DataComponents.BUCKET_ENTITY_DATA, oldData));
+                    }
+                }
+
                 checkExtraContent(player, level, itemStack, blockPos);
                 if (player instanceof ServerPlayer) {
                     CriteriaTriggers.PLACED_BLOCK.trigger((ServerPlayer) player, blockPos, itemStack);
@@ -67,35 +78,29 @@ public class VillagerBucket extends MobBucketItem {
     public void appendHoverText(ItemStack itemStack, Item.TooltipContext tooltipContext, List<Component> list, TooltipFlag tooltipFlag) {
         CustomData customData = itemStack.getOrDefault(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY);
         if (customData.isEmpty()) {
-            return;
+            customData = itemStack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+            if (customData.isEmpty()) {
+                return;
+            }
         }
 
-//        CompoundTag data = compoundTag.getCompound("VillagerData");
-        System.out.println(customData.toString());
         Optional<VillagerData> optional = customData.read(CODEC).result();
-
         if (optional.isPresent()) {
             VillagerData data = optional.get();
             ChatFormatting[] chatFormattings = new ChatFormatting[]{ChatFormatting.ITALIC, ChatFormatting.GRAY};
 
-//            if (data.contains("level")) {
-                list.add(Component.translatable("Level: " + data.getLevel()).withStyle(chatFormattings));
-//            }
-//
-//        if (data.contains("type")) {
+            list.add(Component.translatable("Level: " + data.getLevel()).withStyle(chatFormattings));
+
             String type = data.getType().toString(); //.toString().split(":")[1];
             String region = I18n.get((type.equals("snow") ? "block.minecraft.snow" : "biome.minecraft." + type));
             list.add(Component.translatable("Region: " + region).withStyle(chatFormattings));
-//        }
-//
-//        if (data.contains("profession")) {
+
             String profession = I18n.get("entity.minecraft.villager." + data.getProfession().toString());//.split(":")[1]);
             list.add(Component.translatable("Profession: " + profession).withStyle(chatFormattings));
-//        }
-//
-//        if (compoundTag.getInt("Age") < 0) {
-//            list.add(Component.literal("Baby").withStyle(chatFormattings));
-//        }
+
+            if (customData.contains("Age") && customData.copyTag().getInt("Age") < 0) {
+                list.add(Component.literal("Baby").withStyle(chatFormattings));
+            }
         }
     }
 
