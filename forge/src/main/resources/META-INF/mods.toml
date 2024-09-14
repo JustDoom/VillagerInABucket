@@ -1,0 +1,28 @@
+modLoader = "javafml"
+loaderVersion = "[50,)"
+issueTrackerURL = "https://github.com/JustDoom/VillagerInABucket/issues"
+license = "MIT"
+
+[[mods]]
+modId = "villagerinabucket"
+version = "${version}"
+displayName = "Villager In A Bucket"
+authors = "JustDoom"
+description = '''
+Pick them up in a bucket
+'''
+logoFile = "logo.png"
+
+[[dependencies.villagerinabucket]]
+modId = "forge"
+mandatory = true
+versionRange = "[50,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.villagerinabucket]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.20.6,)"
+ordering = "NONE"
+side = "BOTH"
