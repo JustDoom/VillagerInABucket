@@ -5,7 +5,6 @@ import com.imjustdoom.villagerinabucket.item.ModItems;
 import com.mojang.serialization.DataResult;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
@@ -26,7 +25,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.function.Supplier;
 
 @Mod(VillagerInABucket.MOD_ID)
-public class VillagerInABucketForge {
+public class VillagerInABucketNeoForge {
 
     private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, VillagerInABucket.MOD_ID);
     private static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), VillagerInABucket.MOD_ID);
@@ -58,11 +57,9 @@ public class VillagerInABucketForge {
             .build()
     );
 
-    public VillagerInABucketForge(IEventBus modEventBus) {
+    public VillagerInABucketNeoForge(IEventBus modEventBus) {
 
         modEventBus.addListener(this::commonSetup);
-
-        NeoForge.EVENT_BUS.register(this);
 
         ITEMS.register("villager_in_a_bucket", () -> ModItems.VILLAGER_IN_A_BUCKET);
         ITEMS.register("wandering_trader_in_a_bucket", () -> ModItems.WANDERING_TRADER_IN_A_BUCKET);

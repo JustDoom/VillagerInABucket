@@ -14,15 +14,15 @@ Pick them up in a bucket
 logoFile = "logo.png"
 
 [[dependencies.villagerinabucket]]
-modId = "forge"
-mandatory = true
-versionRange = "[2,)"
+modId = "neoforge"
+type = "required"
+versionRange = "[20.6,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.villagerinabucket]]
 modId = "minecraft"
-mandatory = true
+type = "required"
 versionRange = "[1.20.6,)"
 ordering = "NONE"
 side = "BOTH"
