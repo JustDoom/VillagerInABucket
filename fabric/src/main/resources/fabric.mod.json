@@ -23,7 +23,7 @@
     "villagerinabucket-common.mixins.json"
   ],
   "depends": {
-    "fabric": "*",
-    "minecraft": ">=1.20.5"
+    "fabric-api": "*",
+    "minecraft": ">=1.21"
   }
 }

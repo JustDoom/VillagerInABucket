@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[2,)"
+loaderVersion = "[4,)"
 issueTrackerURL = "https://github.com/JustDoom/VillagerInABucket/issues"
 license = "MIT"
 
@@ -16,14 +16,14 @@ logoFile = "logo.png"
 [[dependencies.villagerinabucket]]
 modId = "neoforge"
 type = "required"
-versionRange = "[20.6,)"
+versionRange = "[21.1,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.villagerinabucket]]
 modId = "minecraft"
 type = "required"
-versionRange = "[1.20.6,)"
+versionRange = "[1.21,)"
 ordering = "NONE"
 side = "BOTH"
 

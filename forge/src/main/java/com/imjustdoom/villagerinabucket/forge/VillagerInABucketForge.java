@@ -58,9 +58,9 @@ public class VillagerInABucketForge {
             .build()
     );
 
-    public VillagerInABucketForge() {
+    public VillagerInABucketForge(FMLJavaModLoadingContext context) {
 
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        IEventBus modEventBus = context.getModEventBus();
         modEventBus.addListener(this::commonSetup);
 
         ITEMS.register("villager_in_a_bucket", () -> ModItems.VILLAGER_IN_A_BUCKET);
