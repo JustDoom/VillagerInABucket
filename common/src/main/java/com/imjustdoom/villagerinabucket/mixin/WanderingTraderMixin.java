@@ -56,7 +56,7 @@ public abstract class WanderingTraderMixin extends AbstractVillager implements B
         }
 
         discard();
-        cir.setReturnValue(InteractionResult.sidedSuccess(level().isClientSide()));
+        cir.setReturnValue(InteractionResult.SUCCESS);
     }
 
     @Override

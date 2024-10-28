@@ -54,8 +54,9 @@ public class VillagerInABucketFabric implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(VillagerInABucket.MOD_ID, "villager_in_a_bucket"), ModItems.VILLAGER_IN_A_BUCKET);
-        Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(VillagerInABucket.MOD_ID, "wandering_trader_in_a_bucket"), ModItems.WANDERING_TRADER_IN_A_BUCKET);
+        System.out.println("ID: " + ModItems.VILLAGER_IN_A_BUCKET.builtInRegistryHolder().key());
+        Registry.register(BuiltInRegistries.ITEM, ModItems.VILLAGER_IN_A_BUCKET.builtInRegistryHolder().key(), ModItems.VILLAGER_IN_A_BUCKET);
+        Registry.register(BuiltInRegistries.ITEM, ModItems.WANDERING_TRADER_IN_A_BUCKET.builtInRegistryHolder().key(), ModItems.WANDERING_TRADER_IN_A_BUCKET);
 
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ResourceLocation.fromNamespaceAndPath(VillagerInABucket.MOD_ID, "villagerinabucket_tab"), VILLAGERINABUCKET_TAB);
 

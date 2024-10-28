@@ -1,19 +1,17 @@
 package com.imjustdoom.villagerinabucket.item.custom;
 
 import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.MapDecoder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.player.Player;
@@ -28,7 +26,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -43,13 +40,13 @@ public class VillagerBucket extends MobBucketItem {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
+    public InteractionResult use(Level level, Player player, InteractionHand interactionHand) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
         BlockHitResult blockHitResult = getPlayerPOVHitResult(level, player, ClipContext.Fluid.NONE);
         if (blockHitResult.getType() == HitResult.Type.MISS) {
-            return InteractionResultHolder.pass(itemStack);
+            return InteractionResult.PASS;
         } else if (blockHitResult.getType() != HitResult.Type.BLOCK) {
-            return InteractionResultHolder.pass(itemStack);
+            return InteractionResult.PASS;
         } else {
             BlockPos blockPos = blockHitResult.getBlockPos();
             if (level.mayInteract(player, blockPos)) {
@@ -67,9 +64,9 @@ public class VillagerBucket extends MobBucketItem {
                 }
                 // TODO: Try make bucket with no nbt make villager type the same as biome spawned in
                 player.awardStat(Stats.ITEM_USED.get(this));
-                return InteractionResultHolder.sidedSuccess(getEmptySuccessItem(itemStack, player), level.isClientSide());
+                return InteractionResult.SUCCESS.heldItemTransformedTo(getEmptySuccessItem(itemStack, player));
             } else {
-                return InteractionResultHolder.fail(itemStack);
+                return InteractionResult.FAIL;
             }
         }
     }

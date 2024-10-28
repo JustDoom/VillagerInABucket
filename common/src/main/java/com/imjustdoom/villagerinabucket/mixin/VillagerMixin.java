@@ -67,7 +67,7 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
         }
 
         discard();
-        cir.setReturnValue(InteractionResult.sidedSuccess(level().isClientSide()));
+        cir.setReturnValue(InteractionResult.SUCCESS);
     }
 
     @Override
