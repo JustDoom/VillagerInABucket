@@ -33,24 +33,22 @@ public class VillagerInABucketForge {
 
     public static final Supplier<CreativeModeTab> VILLAGERINABUCKET_TAB = TABS.register("villagerinabucket_tab", () -> CreativeModeTab.builder()
             .title(Component.translatable("category.villagerinabucket.villagerinabucket_tab"))
-            .icon(() -> new ItemStack(ModItems.VILLAGER_IN_A_BUCKET))
+            .icon(() -> new ItemStack(ModItems.VILLAGER_IN_A_BUCKET.right))
             .displayItems((params, output) -> {
                 // TODO: Try account for modded villager types and add them to the creative menu (with our default texture)
 
-                output.accept(ModItems.VILLAGER_IN_A_BUCKET);
-                output.accept(ModItems.WANDERING_TRADER_IN_A_BUCKET);
+                output.accept(ModItems.VILLAGER_IN_A_BUCKET.right);
+                output.accept(ModItems.WANDERING_TRADER_IN_A_BUCKET.right);
 
                 for (VillagerType type : BuiltInRegistries.VILLAGER_TYPE) {
-                    ItemStack itemStack = new ItemStack(ModItems.VILLAGER_IN_A_BUCKET);
+                    ItemStack itemStack = new ItemStack(ModItems.VILLAGER_IN_A_BUCKET.right);
 
                     if (VillagerInABucket.VILLAGER_DATA_LIST.containsKey(type)) {
                         itemStack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(VillagerInABucket.VILLAGER_DATA_LIST.get(type)));
                     }
 
                     VillagerData villagerData = new VillagerData(type, VillagerProfession.NONE, 0);
-                    DataResult<Tag> data = VillagerData.CODEC.encodeStart(NbtOps.INSTANCE, villagerData);
-
-                    data.resultOrPartial(s -> System.out.println("Oh no something happened, no idea how or what the consequences are. Contact Villager In A Bucket support though"))
+                    VillagerData.CODEC.encodeStart(NbtOps.INSTANCE, villagerData).resultOrPartial(s -> System.out.println("Oh no something happened, no idea how or what the consequences are. Contact Villager In A Bucket support though"))
                             .ifPresent(tag -> CustomData.update(DataComponents.BUCKET_ENTITY_DATA, itemStack, compoundTag -> compoundTag.put("VillagerData", tag)));
                     output.accept(itemStack);
                 }
@@ -63,8 +61,8 @@ public class VillagerInABucketForge {
         IEventBus modEventBus = context.getModEventBus();
         modEventBus.addListener(this::commonSetup);
 
-        ITEMS.register("villager_in_a_bucket", () -> ModItems.VILLAGER_IN_A_BUCKET);
-        ITEMS.register("wandering_trader_in_a_bucket", () -> ModItems.WANDERING_TRADER_IN_A_BUCKET);
+        ITEMS.register("villager_in_a_bucket", () -> ModItems.VILLAGER_IN_A_BUCKET.right);
+        ITEMS.register("wandering_trader_in_a_bucket", () -> ModItems.WANDERING_TRADER_IN_A_BUCKET.right);
 
         ITEMS.register(modEventBus);
         TABS.register(modEventBus);
