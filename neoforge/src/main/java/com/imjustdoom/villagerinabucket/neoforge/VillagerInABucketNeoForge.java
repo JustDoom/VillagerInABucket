@@ -22,6 +22,7 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 @Mod(VillagerInABucket.MOD_ID)
@@ -43,7 +44,7 @@ public class VillagerInABucketNeoForge {
                     ItemStack itemStack = new ItemStack(ModItems.VILLAGER_IN_A_BUCKET.right);
 
                     if (VillagerInABucket.VILLAGER_DATA_LIST.containsKey(type)) {
-                        itemStack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(VillagerInABucket.VILLAGER_DATA_LIST.get(type)));
+                        itemStack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of(String.valueOf(VillagerInABucket.VILLAGER_DATA_LIST.get(type))), List.of()));
                     }
 
                     VillagerData villagerData = new VillagerData(type, VillagerProfession.NONE, 0);

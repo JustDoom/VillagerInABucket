@@ -2,31 +2,5 @@
   "parent": "item/generated",
   "textures": {
     "layer0": "villagerinabucket:item/villager_in_a_bucket"
-  },
-  "overrides": [
-    {
-      "predicate": {
-        "custom_model_data": 1
-      },
-      "model": "villagerinabucket:item/desert_villager_in_a_bucket"
-    },
-    {
-      "predicate": {
-        "custom_model_data": 2
-      },
-      "model": "villagerinabucket:item/savanna_villager_in_a_bucket"
-    },
-    {
-      "predicate": {
-        "custom_model_data": 3
-      },
-      "model": "villagerinabucket:item/snow_villager_in_a_bucket"
-    },
-    {
-      "predicate": {
-        "custom_model_data": 4
-      },
-      "model": "villagerinabucket:item/swamp_villager_in_a_bucket"
-    }
-  ]
+  }
 }

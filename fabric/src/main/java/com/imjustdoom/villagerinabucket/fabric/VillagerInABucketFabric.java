@@ -24,6 +24,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.CustomModelData;
 
+import java.util.List;
+
 public class VillagerInABucketFabric implements ModInitializer {
 
     private static final CreativeModeTab VILLAGERINABUCKET_TAB = FabricItemGroup.builder()
@@ -39,7 +41,7 @@ public class VillagerInABucketFabric implements ModInitializer {
                     ItemStack itemStack = new ItemStack(ModItems.VILLAGER_IN_A_BUCKET.right);
 
                     if (VillagerInABucket.VILLAGER_DATA_LIST.containsKey(type)) {
-                        itemStack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(VillagerInABucket.VILLAGER_DATA_LIST.get(type)));
+                        itemStack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of(String.valueOf(VillagerInABucket.VILLAGER_DATA_LIST.get(type))), List.of()));
                     }
 
                     VillagerData villagerData = new VillagerData(type, VillagerProfession.NONE, 0);
