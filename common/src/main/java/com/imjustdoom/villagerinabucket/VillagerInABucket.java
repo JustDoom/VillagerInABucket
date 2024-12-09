@@ -18,12 +18,12 @@ import java.util.Map;
 public class VillagerInABucket {
     public static final String MOD_ID = "villagerinabucket";
 
-    public static final Map<VillagerType, Integer> VILLAGER_DATA_LIST = new HashMap<>() {
+    public static final Map<VillagerType, String> VILLAGER_DATA_LIST = new HashMap<>() {
         {
-            put(VillagerType.DESERT, 1);
-            put(VillagerType.SAVANNA, 2);
-            put(VillagerType.SNOW, 3);
-            put(VillagerType.SWAMP, 4);
+            put(VillagerType.DESERT, "desert");
+            put(VillagerType.SAVANNA, "savanna");
+            put(VillagerType.SNOW, "snow");
+            put(VillagerType.SWAMP, "swamp");
         }
     };
 

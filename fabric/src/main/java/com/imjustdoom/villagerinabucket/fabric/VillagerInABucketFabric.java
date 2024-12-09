@@ -41,7 +41,7 @@ public class VillagerInABucketFabric implements ModInitializer {
                     ItemStack itemStack = new ItemStack(ModItems.VILLAGER_IN_A_BUCKET.right);
 
                     if (VillagerInABucket.VILLAGER_DATA_LIST.containsKey(type)) {
-                        itemStack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of(String.valueOf(VillagerInABucket.VILLAGER_DATA_LIST.get(type))), List.of()));
+                        itemStack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of(VillagerInABucket.VILLAGER_DATA_LIST.get(type)), List.of()));
                     }
 
                     VillagerData villagerData = new VillagerData(type, VillagerProfession.NONE, 0);
