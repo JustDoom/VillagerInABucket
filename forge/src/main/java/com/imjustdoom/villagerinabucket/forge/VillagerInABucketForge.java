@@ -53,6 +53,8 @@ public class VillagerInABucketForge {
                             .ifPresent(tag -> CustomData.update(DataComponents.BUCKET_ENTITY_DATA, itemStack, compoundTag -> compoundTag.put("VillagerData", tag)));
                     output.accept(itemStack);
                 }
+
+                output.accept(ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET.right);
             })
             .build()
     );
@@ -64,6 +66,7 @@ public class VillagerInABucketForge {
 
         ITEMS.register("villager_in_a_bucket", () -> ModItems.VILLAGER_IN_A_BUCKET.right);
         ITEMS.register("wandering_trader_in_a_bucket", () -> ModItems.WANDERING_TRADER_IN_A_BUCKET.right);
+        ITEMS.register("zombie_villager_in_a_bucket", () -> ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET.right);
 
         ITEMS.register(modEventBus);
         TABS.register(modEventBus);

@@ -49,6 +49,8 @@ public class VillagerInABucketFabric implements ModInitializer {
                             .ifPresent(tag -> CustomData.update(DataComponents.BUCKET_ENTITY_DATA, itemStack, compoundTag -> compoundTag.put("VillagerData", tag)));
                     output.accept(itemStack);
                 }
+
+                output.accept(ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET.right);
             })
             .build();
 
@@ -56,6 +58,7 @@ public class VillagerInABucketFabric implements ModInitializer {
     public void onInitialize() {
         Registry.register(BuiltInRegistries.ITEM, ModItems.VILLAGER_IN_A_BUCKET.left, ModItems.VILLAGER_IN_A_BUCKET.right);
         Registry.register(BuiltInRegistries.ITEM, ModItems.WANDERING_TRADER_IN_A_BUCKET.left, ModItems.WANDERING_TRADER_IN_A_BUCKET.right);
+        Registry.register(BuiltInRegistries.ITEM, ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET.left, ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET.right);
 
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ResourceLocation.fromNamespaceAndPath(VillagerInABucket.MOD_ID, "villagerinabucket_tab"), VILLAGERINABUCKET_TAB);
 

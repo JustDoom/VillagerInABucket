@@ -19,7 +19,7 @@ public class ModItems {
 
     public static final ImmutablePair<ResourceKey<Item>, Item> WANDERING_TRADER_IN_A_BUCKET = registerBucketItem("wandering_trader_in_a_bucket", VillagerBucket.class, EntityType.WANDERING_TRADER, SoundEvents.VILLAGER_TRADE, new Item.Properties().stacksTo(1));
 
-//    public static final ImmutablePair<ResourceKey<Item>, Item> ZOMBIE_VILLAGER_IN_A_BUCKET = registerBucketItem("zombie_villager_in_a_bucket", VillagerBucket.class, EntityType.ZOMBIE_VILLAGER, SoundEvents.ZOMBIE_INFECT, new Item.Properties().stacksTo(1));
+    public static final ImmutablePair<ResourceKey<Item>, Item> ZOMBIE_VILLAGER_IN_A_BUCKET = registerBucketItem("zombie_villager_in_a_bucket", VillagerBucket.class, EntityType.ZOMBIE_VILLAGER, SoundEvents.ZOMBIE_VILLAGER_AMBIENT, new Item.Properties().stacksTo(1));
 
     public static ImmutablePair<ResourceKey<Item>, Item> registerBucketItem(String id, Class<?> clazz, EntityType<?> entityType, SoundEvent soundEvent, Item.Properties properties) {
         try {
