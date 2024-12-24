@@ -56,6 +56,8 @@ public class VillagerInABucketFabric implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        VillagerInABucket.init();
+
         Registry.register(BuiltInRegistries.ITEM, ModItems.VILLAGER_IN_A_BUCKET.left, ModItems.VILLAGER_IN_A_BUCKET.right);
         Registry.register(BuiltInRegistries.ITEM, ModItems.WANDERING_TRADER_IN_A_BUCKET.left, ModItems.WANDERING_TRADER_IN_A_BUCKET.right);
         Registry.register(BuiltInRegistries.ITEM, ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET.left, ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET.right);
