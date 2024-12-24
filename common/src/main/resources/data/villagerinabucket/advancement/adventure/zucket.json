@@ -3,7 +3,7 @@
     "icon": {
       "id": "villagerinabucket:zombie_villager_in_a_bucket"
     },
-    "title": "Something smells... Suspicious",
+    "title": "Zucket???",
     "description": "Capture a Zombie Villager inside a bucket",
     "frame": "task",
     "show_toast": true,
