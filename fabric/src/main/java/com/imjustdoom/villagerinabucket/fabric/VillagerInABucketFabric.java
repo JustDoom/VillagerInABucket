@@ -43,13 +43,18 @@ public class VillagerInABucketFabric implements ModInitializer {
                     data.resultOrPartial(s -> System.out.println("Oh no something happened, no idea how or what the consequences are. Contact Villager In A Bucket support though")).ifPresent(tag -> compoundTag.put("VillagerData", tag));
                     output.accept(itemStack);
                 }
+
+                output.accept(ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET);
             })
             .build();
 
     @Override
     public void onInitialize() {
+        VillagerInABucket.init();
+
         Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(VillagerInABucket.MOD_ID, "villager_in_a_bucket"), ModItems.VILLAGER_IN_A_BUCKET);
         Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(VillagerInABucket.MOD_ID, "wandering_trader_in_a_bucket"), ModItems.WANDERING_TRADER_IN_A_BUCKET);
+        Registry.register(BuiltInRegistries.ITEM, new ResourceLocation(VillagerInABucket.MOD_ID, "zombie_villager_in_a_bucket"), ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET);
 
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, new ResourceLocation(VillagerInABucket.MOD_ID, "villagerinabucket_tab"), VILLAGERINABUCKET_TAB);
 

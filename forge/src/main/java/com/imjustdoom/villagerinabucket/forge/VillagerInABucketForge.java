@@ -50,11 +50,14 @@ public class VillagerInABucketForge {
                     data.resultOrPartial(s -> System.out.println("Oh no something happened, no idea how or what the consequences are. Contact Villager In A Bucket support though")).ifPresent(tag -> compoundTag.put("VillagerData", tag));
                     output.accept(itemStack);
                 }
+
+                output.accept(ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET);
             })
             .build()
     );
 
     public VillagerInABucketForge() {
+        VillagerInABucket.init();
 
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
@@ -64,6 +67,7 @@ public class VillagerInABucketForge {
 
         ITEMS.register("villager_in_a_bucket", () -> ModItems.VILLAGER_IN_A_BUCKET);
         ITEMS.register("wandering_trader_in_a_bucket", () -> ModItems.WANDERING_TRADER_IN_A_BUCKET);
+        ITEMS.register("zombie_villager_in_a_bucket", () -> ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET);
 
         ITEMS.register(modEventBus);
         TABS.register(modEventBus);

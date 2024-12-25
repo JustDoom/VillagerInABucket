@@ -1,6 +1,7 @@
 package com.imjustdoom.villagerinabucket.mixin;
 
 import com.imjustdoom.villagerinabucket.VillagerBucketable;
+import com.imjustdoom.villagerinabucket.config.Config;
 import com.imjustdoom.villagerinabucket.item.ModItems;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.nbt.CompoundTag;
@@ -48,7 +49,7 @@ public abstract class ZombieVillagerMixin extends Zombie implements Bucketable, 
     @Inject(method = "mobInteract", at = @At("HEAD"), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     public void mobInteract(Player player, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResult> cir) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
-        if (itemStack.getItem() != Items.BUCKET || !isAlive()) {
+        if (itemStack.getItem() != Items.BUCKET || !isAlive() || !Config.ZOMBIE_VILLAGER) {
             return;
         }
 
