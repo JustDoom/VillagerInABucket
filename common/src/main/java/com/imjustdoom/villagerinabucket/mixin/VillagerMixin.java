@@ -122,6 +122,12 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
 
     @Override
     public @NotNull SoundEvent getPickupSound() {
+        if (((AbstractVillager) this) instanceof Villager) {
+            return SoundEvents.VILLAGER_TRADE;
+        } else if (((AbstractVillager) this) instanceof WanderingTrader) {
+            return SoundEvents.WANDERING_TRADER_NO;
+        }
+
         return SoundEvents.VILLAGER_TRADE;
     }
 
