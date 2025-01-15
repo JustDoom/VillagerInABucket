@@ -2,6 +2,7 @@ package com.imjustdoom.villagerinabucket.mixin;
 
 import com.imjustdoom.villagerinabucket.VillagerBucketable;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.server.level.ServerLevel;
@@ -11,6 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.phys.AABB;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -33,10 +35,27 @@ public abstract class DispenseBucketBehaviorMixin {
                     ItemStack stack = villager.createBucketStack();
                     livingEntity.discard();
 
-                    cir.setReturnValue(stack);
+                    cir.setReturnValue(villagerinabucket$consume(blockSource, itemStack, new ItemStack(stack.getItem())));
                     return;
                 }
             }
+        }
+    }
+
+    @Unique
+    private ItemStack villagerinabucket$consume(BlockSource blockSource, ItemStack stack, ItemStack remainder) {
+        stack.shrink(1);
+        if (stack.isEmpty()) {
+            return remainder;
+        } else {
+            ItemStack itemStack = blockSource.blockEntity().insertItem(remainder);
+            if (!itemStack.isEmpty()) {
+                Direction direction = blockSource.state().getValue(DispenserBlock.FACING);
+                DefaultDispenseItemBehavior.spawnItem(blockSource.level(), itemStack, 6, direction, DispenserBlock.getDispensePosition(blockSource));
+                blockSource.level().levelEvent(1000, blockSource.pos(), 0);
+                blockSource.level().levelEvent(2000, blockSource.pos(), direction.get3DDataValue());
+            }
+            return stack;
         }
     }
 }
