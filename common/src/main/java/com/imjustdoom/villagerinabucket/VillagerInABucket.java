@@ -51,6 +51,7 @@ public class VillagerInABucket {
 
         DispenserBlock.registerBehavior(ModItems.VILLAGER_IN_A_BUCKET.right, dispenseItemBehavior);
         DispenserBlock.registerBehavior(ModItems.WANDERING_TRADER_IN_A_BUCKET.right, dispenseItemBehavior);
+        DispenserBlock.registerBehavior(ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET.right, dispenseItemBehavior);
     }
 
     public static void init() {
