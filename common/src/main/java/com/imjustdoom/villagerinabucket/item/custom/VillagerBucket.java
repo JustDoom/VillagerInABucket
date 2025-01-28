@@ -15,6 +15,7 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -38,7 +39,7 @@ public class VillagerBucket extends MobBucketItem {
 
     public static final MapCodec<VillagerData> CODEC;
 
-    public VillagerBucket(EntityType<?> entityType, SoundEvent soundEvent, Properties properties) {
+    public VillagerBucket(EntityType<? extends Mob> entityType, SoundEvent soundEvent, Properties properties) {
         super(entityType, Fluids.EMPTY, soundEvent, properties);
     }
 
