@@ -134,6 +134,8 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
         } else if (((AbstractVillager) this) instanceof WanderingTrader) {
             return SoundEvents.WANDERING_TRADER_NO;
         }
+
+        return SoundEvents.VILLAGER_TRADE;
     }
 
     static {
