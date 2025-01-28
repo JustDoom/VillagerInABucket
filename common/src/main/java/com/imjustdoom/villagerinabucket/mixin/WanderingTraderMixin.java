@@ -132,6 +132,6 @@ public abstract class WanderingTraderMixin extends AbstractVillager implements B
 
     @Override
     public @NotNull SoundEvent getPickupSound() {
-        return SoundEvents.VILLAGER_TRADE;
+        return SoundEvents.WANDERING_TRADER_NO;
     }
 }
