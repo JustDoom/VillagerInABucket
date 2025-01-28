@@ -60,6 +60,7 @@ public class VillagerInABucketForge {
     );
 
     public VillagerInABucketForge() {
+        VillagerInABucket.init();
 
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(this::commonSetup);
