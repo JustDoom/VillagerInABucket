@@ -1,6 +1,7 @@
 package com.imjustdoom.villagerinabucket.forge;
 
 import com.imjustdoom.villagerinabucket.VillagerInABucket;
+import com.imjustdoom.villagerinabucket.config.Config;
 import com.imjustdoom.villagerinabucket.item.ModItems;
 import com.mojang.serialization.DataResult;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -56,6 +57,7 @@ public class VillagerInABucketForge {
     );
 
     public VillagerInABucketForge() {
+        VillagerInABucket.init();
 
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 

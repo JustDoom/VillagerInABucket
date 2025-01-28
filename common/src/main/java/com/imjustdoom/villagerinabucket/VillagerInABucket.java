@@ -1,5 +1,6 @@
 package com.imjustdoom.villagerinabucket;
 
+import com.imjustdoom.villagerinabucket.config.Config;
 import com.imjustdoom.villagerinabucket.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.dispenser.BlockSource;
@@ -12,6 +13,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,5 +49,14 @@ public class VillagerInABucket {
         DispenserBlock.registerBehavior(ModItems.VILLAGER_IN_A_BUCKET, dispenseItemBehavior);
         DispenserBlock.registerBehavior(ModItems.WANDERING_TRADER_IN_A_BUCKET, dispenseItemBehavior);
         DispenserBlock.registerBehavior(ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET, dispenseItemBehavior);
+    }
+
+    public static void init() {
+        try {
+            Config.init();
+        } catch (IOException exception) {
+            System.err.println("There was an error setting up or saving the config file for Villager In A Bucket :(");
+            exception.printStackTrace();
+        }
     }
 }
