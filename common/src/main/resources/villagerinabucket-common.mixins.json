@@ -6,7 +6,8 @@
   "mixins": [
     "DispenseBucketBehaviorMixin",
     "VillagerMixin",
-    "WanderingTraderMixin"
+    "WanderingTraderMixin",
+    "ZombieVillagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

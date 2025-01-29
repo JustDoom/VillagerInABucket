@@ -39,6 +39,7 @@ public class VillagerInABucketForge {
 
                 output.accept(ModItems.VILLAGER_IN_A_BUCKET);
                 output.accept(ModItems.WANDERING_TRADER_IN_A_BUCKET);
+                output.accept(ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET);
 
                 for (VillagerType type : BuiltInRegistries.VILLAGER_TYPE) {
                     ItemStack itemStack = new ItemStack(ModItems.VILLAGER_IN_A_BUCKET);
@@ -65,6 +66,7 @@ public class VillagerInABucketForge {
 
         ITEMS.register("villager_in_a_bucket", () -> ModItems.VILLAGER_IN_A_BUCKET);
         ITEMS.register("wandering_trader_in_a_bucket", () -> ModItems.WANDERING_TRADER_IN_A_BUCKET);
+        ITEMS.register("zombie_villager_in_a_bucket", () -> ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET);
 
         ITEMS.register(modEventBus);
         TABS.register(modEventBus);

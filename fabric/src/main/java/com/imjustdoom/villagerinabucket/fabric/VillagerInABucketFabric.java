@@ -34,6 +34,7 @@ public class VillagerInABucketFabric implements ModInitializer {
 
                 output.accept(ModItems.VILLAGER_IN_A_BUCKET);
                 output.accept(ModItems.WANDERING_TRADER_IN_A_BUCKET);
+                output.accept(ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET);
 
                 for (VillagerType type : BuiltInRegistries.VILLAGER_TYPE) {
                     ItemStack itemStack = new ItemStack(ModItems.VILLAGER_IN_A_BUCKET);
@@ -56,6 +57,7 @@ public class VillagerInABucketFabric implements ModInitializer {
     public void onInitialize() {
         Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(VillagerInABucket.MOD_ID, "villager_in_a_bucket"), ModItems.VILLAGER_IN_A_BUCKET);
         Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(VillagerInABucket.MOD_ID, "wandering_trader_in_a_bucket"), ModItems.WANDERING_TRADER_IN_A_BUCKET);
+        Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(VillagerInABucket.MOD_ID, "zombie_villager_in_a_bucket"), ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET);
 
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ResourceLocation.fromNamespaceAndPath(VillagerInABucket.MOD_ID, "villagerinabucket_tab"), VILLAGERINABUCKET_TAB);
 
