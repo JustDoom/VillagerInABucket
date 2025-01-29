@@ -1,5 +1,6 @@
 package com.imjustdoom.villagerinabucket;
 
+import com.imjustdoom.villagerinabucket.config.Config;
 import com.imjustdoom.villagerinabucket.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.dispenser.BlockSource;
@@ -11,12 +12,16 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class VillagerInABucket {
     public static final String MOD_ID = "villagerinabucket";
+    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     public static final Map<VillagerType, Integer> VILLAGER_DATA_LIST = new HashMap<>() {
         {
@@ -46,5 +51,15 @@ public class VillagerInABucket {
 
         DispenserBlock.registerBehavior(ModItems.VILLAGER_IN_A_BUCKET.right, dispenseItemBehavior);
         DispenserBlock.registerBehavior(ModItems.WANDERING_TRADER_IN_A_BUCKET.right, dispenseItemBehavior);
+        DispenserBlock.registerBehavior(ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET.right, dispenseItemBehavior);
+    }
+
+    public static void init() {
+        try {
+            Config.init();
+        } catch (IOException exception) {
+            System.err.println("There was an error setting up or saving the config file for Villager In A Bucket :(");
+            exception.printStackTrace();
+        }
     }
 }

@@ -39,6 +39,7 @@ public class VillagerInABucketForge {
 
                 output.accept(ModItems.VILLAGER_IN_A_BUCKET.right);
                 output.accept(ModItems.WANDERING_TRADER_IN_A_BUCKET.right);
+                output.accept(ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET.right);
 
                 for (VillagerType type : BuiltInRegistries.VILLAGER_TYPE) {
                     ItemStack itemStack = new ItemStack(ModItems.VILLAGER_IN_A_BUCKET.right);
@@ -57,12 +58,14 @@ public class VillagerInABucketForge {
     );
 
     public VillagerInABucketForge(FMLJavaModLoadingContext context) {
+        VillagerInABucket.init();
 
         IEventBus modEventBus = context.getModEventBus();
         modEventBus.addListener(this::commonSetup);
 
         ITEMS.register("villager_in_a_bucket", () -> ModItems.VILLAGER_IN_A_BUCKET.right);
         ITEMS.register("wandering_trader_in_a_bucket", () -> ModItems.WANDERING_TRADER_IN_A_BUCKET.right);
+        ITEMS.register("zombie_villager_in_a_bucket", () -> ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET.right);
 
         ITEMS.register(modEventBus);
         TABS.register(modEventBus);

@@ -38,6 +38,7 @@ public class VillagerInABucketNeoForge {
 
                 output.accept(ModItems.VILLAGER_IN_A_BUCKET.right);
                 output.accept(ModItems.WANDERING_TRADER_IN_A_BUCKET.right);
+                output.accept(ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET.right);
 
                 for (VillagerType type : BuiltInRegistries.VILLAGER_TYPE) {
                     ItemStack itemStack = new ItemStack(ModItems.VILLAGER_IN_A_BUCKET.right);
@@ -47,7 +48,9 @@ public class VillagerInABucketNeoForge {
                     }
 
                     VillagerData villagerData = new VillagerData(type, VillagerProfession.NONE, 0);
-                    VillagerData.CODEC.encodeStart(NbtOps.INSTANCE, villagerData).resultOrPartial(s -> System.out.println("Oh no something happened, no idea how or what the consequences are. Contact Villager In A Bucket support though"))
+                    DataResult<Tag> data = VillagerData.CODEC.encodeStart(NbtOps.INSTANCE, villagerData);
+
+                    data.resultOrPartial(s -> System.out.println("Oh no something happened, no idea how or what the consequences are. Contact Villager In A Bucket support though"))
                             .ifPresent(tag -> CustomData.update(DataComponents.BUCKET_ENTITY_DATA, itemStack, compoundTag -> compoundTag.put("VillagerData", tag)));
                     output.accept(itemStack);
                 }
@@ -56,11 +59,13 @@ public class VillagerInABucketNeoForge {
     );
 
     public VillagerInABucketNeoForge(IEventBus modEventBus) {
+        VillagerInABucket.init();
 
         modEventBus.addListener(this::commonSetup);
 
         ITEMS.register("villager_in_a_bucket", () -> ModItems.VILLAGER_IN_A_BUCKET.right);
         ITEMS.register("wandering_trader_in_a_bucket", () -> ModItems.WANDERING_TRADER_IN_A_BUCKET.right);
+        ITEMS.register("zombie_villager_in_a_bucket", () -> ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET.right);
 
         ITEMS.register(modEventBus);
         TABS.register(modEventBus);
