@@ -1,5 +1,6 @@
 package com.imjustdoom.villagerinabucket;
 
+import com.imjustdoom.villagerinabucket.config.Config;
 import com.imjustdoom.villagerinabucket.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.dispenser.BlockSource;

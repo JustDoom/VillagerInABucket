@@ -59,7 +59,7 @@ public class VillagerInABucketNeoForge {
     );
 
     public VillagerInABucketNeoForge(IEventBus modEventBus) {
-        VillagerInABucket.init();c
+        VillagerInABucket.init();
 
         modEventBus.addListener(this::commonSetup);
 
