@@ -1,29 +1,32 @@
 {
-  "schemaVersion": 1,
-  "id": "villagerinabucket",
-  "version": "${version}",
-  "name": "Villager In A Bucket",
-  "description": "Pick them up in a bucket",
-  "authors": [
-    "JustDoom"
-  ],
-  "contact": {
-    "sources": "https://github.com/JustDoom/VillagerInABucket",
-    "issues": "https://github.com/JustDoom/VillagerInABucket/issues"
-  },
-  "license": "MIT",
-  "icon": "logo.png",
-  "environment": "*",
-  "entrypoints": {
-    "main": [
-      "com.imjustdoom.villagerinabucket.fabric.VillagerInABucketFabric"
-    ]
-  },
-  "mixins": [
-    "villagerinabucket-common.mixins.json"
-  ],
-  "depends": {
-    "fabric-api": "*",
-    "minecraft": ">=1.21.4"
-  }
+    "schemaVersion": 1,
+    "id": "${mod_id}",
+    "version": "${version}",
+    "name": "${mod_name}",
+    "description": "${description}",
+    "authors": [
+        "${mod_author}"
+    ],
+    "contact": {
+        "sources": "https://github.com/JustDoom/VillagerInABucket",
+        "issues": "https://github.com/JustDoom/VillagerInABucket/issues"
+    },
+    "license": "${license}",
+    "icon": "${mod_id}.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "com.imjustdoom.villagerinabucket.fabric.VillagerInABucketFabric"
+        ]
+    },
+    "mixins": [
+        "${mod_id}-common.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=${fabric_loader_version}",
+        "fabric-api": "*",
+        "minecraft": "~${minecraft_version}",
+        "java": ">=${java_version}"
+    }
 }
+  
