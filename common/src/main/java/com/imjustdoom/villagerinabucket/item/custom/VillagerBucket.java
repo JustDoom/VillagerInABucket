@@ -13,24 +13,26 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.MobBucketItem;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class VillagerBucket extends MobBucketItem {
 
@@ -72,7 +74,7 @@ public class VillagerBucket extends MobBucketItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack itemStack, Item.TooltipContext tooltipContext, List<Component> list, TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack itemStack, @NotNull TooltipContext tooltipContext, @NotNull TooltipDisplay tooltipDisplay, @NotNull Consumer<Component> list, @NotNull TooltipFlag tooltipFlag) {
         CustomData customData = itemStack.getOrDefault(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY);
         if (customData.isEmpty()) {
             customData = itemStack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
@@ -84,28 +86,28 @@ public class VillagerBucket extends MobBucketItem {
         Optional<VillagerData> optional = customData.read(CODEC).result();
         if (optional.isPresent()) {
             VillagerData data = optional.get();
-            ChatFormatting[] chatFormattings = new ChatFormatting[]{ChatFormatting.ITALIC, ChatFormatting.GRAY};
+            ChatFormatting[] chatFormatting = new ChatFormatting[]{ChatFormatting.ITALIC, ChatFormatting.GRAY};
 
-            list.add(Component.translatable("Level: " + data.getLevel()).withStyle(chatFormattings));
+            list.accept(Component.translatable("Level: " + data.level()).withStyle(chatFormatting));
 
-            String type = data.getType().toString(); //.toString().split(":")[1];
+            String type = data.type().getRegisteredName().split(":")[1];
             String region = I18n.get((type.equals("snow") ? "block.minecraft.snow" : "biome.minecraft." + type));
-            list.add(Component.translatable("Region: " + region).withStyle(chatFormattings));
+            list.accept(Component.translatable("Region: " + region).withStyle(chatFormatting));
 
-            String profession = I18n.get("entity.minecraft.villager." + data.getProfession().toString());//.split(":")[1]);
-            list.add(Component.translatable("Profession: " + profession).withStyle(chatFormattings));
+            String profession = I18n.get("entity.minecraft.villager." + data.profession().getRegisteredName().split(":")[1]);
+            list.accept(Component.translatable("Profession: " + profession).withStyle(chatFormatting));
 
-            if (customData.contains("Age") && customData.copyTag().getInt("Age") < 0) {
-                list.add(Component.literal("Baby").withStyle(chatFormattings));
+            if (customData.copyTag().getInt("Age").isPresent() && customData.copyTag().getInt("Age").get() < 0) {
+                list.accept(Component.literal("Baby").withStyle(chatFormatting));
             }
         }
     }
 
     @Override
-    public boolean emptyContents(@Nullable Player player, Level level, BlockPos blockPos, @Nullable BlockHitResult blockHitResult) {
+    public boolean emptyContents(@Nullable LivingEntity livingEntity, Level level, @NotNull BlockPos blockPos, @Nullable BlockHitResult blockHitResult) {
         BlockState blockstate = level.getBlockState(blockPos);
         if (blockstate.isAir() || blockstate.canBeReplaced(Fluids.EMPTY)) {
-            this.playEmptySound(player, level, blockPos);
+            this.playEmptySound(livingEntity, level, blockPos);
             return true;
         } else {
             return false;

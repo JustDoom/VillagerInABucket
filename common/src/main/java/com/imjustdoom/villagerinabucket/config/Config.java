@@ -1,6 +1,6 @@
 package com.imjustdoom.villagerinabucket.config;
 
-import dev.architectury.injectables.annotations.ExpectPlatform;
+import com.imjustdoom.villagerinabucket.platform.Services;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,7 +19,7 @@ public class Config {
 
     public static void init() throws IOException {
         PROPERTIES = new Properties();
-        FILE_PATH = Path.of(getConfigDirectory() + "/villager-in-a-bucket.properties");
+        FILE_PATH = Path.of(Services.PLATFORM.getConfigPath() + "/villager-in-a-bucket.properties");
         if (!FILE_PATH.toFile().exists()) {
             new File(FILE_PATH.toString()).createNewFile();
         }
@@ -81,10 +81,5 @@ public class Config {
                         Config for Villager In A Bucket
                         'enable-zombie-villager' should the ability to pick up Zombie Villagers in buckets be enabled. Default true
                         """);
-    }
-
-    @ExpectPlatform
-    public static Path getConfigDirectory() {
-        throw new AssertionError();
     }
 }

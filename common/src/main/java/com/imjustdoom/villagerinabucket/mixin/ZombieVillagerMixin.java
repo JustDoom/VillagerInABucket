@@ -3,7 +3,6 @@ package com.imjustdoom.villagerinabucket.mixin;
 import com.imjustdoom.villagerinabucket.VillagerBucketable;
 import com.imjustdoom.villagerinabucket.config.Config;
 import com.imjustdoom.villagerinabucket.item.ModItems;
-import com.imjustdoom.villagerinabucket.item.custom.VillagerBucket;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
@@ -19,15 +18,11 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.Bucketable;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.monster.ZombieVillager;
-import net.minecraft.world.entity.npc.AbstractVillager;
-import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
-import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
@@ -37,9 +32,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.List;
-import java.util.Optional;
 
 @Mixin(ZombieVillager.class)
 public abstract class ZombieVillagerMixin extends Zombie implements Bucketable, VillagerBucketable {
@@ -91,7 +83,7 @@ public abstract class ZombieVillagerMixin extends Zombie implements Bucketable, 
     @Inject(at = @At("HEAD"), method = "readAdditionalSaveData")
     public void readAdditionalSaveData(CompoundTag compound, CallbackInfo ci) {
         super.readAdditionalSaveData(compound);
-        this.setFromBucket(compound.getBoolean("FromBucket"));
+        this.setFromBucket(compound.getBooleanOr("FromBucket", false));
     }
 
     @Override
@@ -105,13 +97,13 @@ public abstract class ZombieVillagerMixin extends Zombie implements Bucketable, 
     }
 
     @Override
-    public void saveToBucketTag(ItemStack itemStack) {
+    public void saveToBucketTag(@NotNull ItemStack itemStack) {
         CustomData.update(DataComponents.BUCKET_ENTITY_DATA, itemStack, this::addAdditionalSaveData);
         Bucketable.saveDefaultDataToBucketTag(this, itemStack);
     }
 
     @Override
-    public void loadFromBucketTag(CompoundTag compoundTag) {
+    public void loadFromBucketTag(@NotNull CompoundTag compoundTag) {
         readAdditionalSaveData(compoundTag);
         Bucketable.loadDefaultDataFromBucketTag(this, compoundTag);
     }

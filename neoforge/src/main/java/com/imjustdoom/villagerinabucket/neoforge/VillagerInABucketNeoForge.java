@@ -2,12 +2,11 @@ package com.imjustdoom.villagerinabucket.neoforge;
 
 import com.imjustdoom.villagerinabucket.VillagerInABucket;
 import com.imjustdoom.villagerinabucket.item.ModItems;
-import com.mojang.serialization.DataResult;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.npc.VillagerType;
@@ -19,7 +18,6 @@ import net.minecraft.world.item.component.CustomModelData;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.List;
@@ -40,14 +38,14 @@ public class VillagerInABucketNeoForge {
                 output.accept(ModItems.VILLAGER_IN_A_BUCKET.right);
                 output.accept(ModItems.WANDERING_TRADER_IN_A_BUCKET.right);
 
-                for (VillagerType type : BuiltInRegistries.VILLAGER_TYPE) {
+                for (ResourceKey<VillagerType> type : BuiltInRegistries.VILLAGER_TYPE.registryKeySet()) {
                     ItemStack itemStack = new ItemStack(ModItems.VILLAGER_IN_A_BUCKET.right);
 
                     if (VillagerInABucket.VILLAGER_DATA_LIST.containsKey(type)) {
                         itemStack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(List.of(), List.of(), List.of(VillagerInABucket.VILLAGER_DATA_LIST.get(type)), List.of()));
                     }
 
-                    VillagerData villagerData = new VillagerData(type, VillagerProfession.NONE, 0);
+                    VillagerData villagerData = new VillagerData(BuiltInRegistries.VILLAGER_TYPE.getOrThrow(type), BuiltInRegistries.VILLAGER_PROFESSION.getOrThrow(VillagerProfession.NONE), 0);
                     VillagerData.CODEC.encodeStart(NbtOps.INSTANCE, villagerData).resultOrPartial(s -> System.out.println("Oh no something happened, no idea how or what the consequences are. Contact Villager In A Bucket support though"))
                             .ifPresent(tag -> CustomData.update(DataComponents.BUCKET_ENTITY_DATA, itemStack, compoundTag -> compoundTag.put("VillagerData", tag)));
                     output.accept(itemStack);

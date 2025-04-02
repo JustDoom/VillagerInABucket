@@ -68,21 +68,21 @@ public abstract class WanderingTraderMixin extends AbstractVillager implements B
     }
 
     @Override
-    public void defineSynchedData(SynchedEntityData.Builder builder) {
+    public void defineSynchedData(SynchedEntityData.@NotNull Builder builder) {
         super.defineSynchedData(builder);
         builder.define(FROM_BUCKET, false);
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(@NotNull CompoundTag compound) {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("FromBucket", this.fromBucket());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(@NotNull CompoundTag compound) {
         super.readAdditionalSaveData(compound);
-        this.setFromBucket(compound.getBoolean("FromBucket"));
+        this.setFromBucket(compound.getBooleanOr("FromBucket", false));
     }
 
     @Override
@@ -96,13 +96,13 @@ public abstract class WanderingTraderMixin extends AbstractVillager implements B
     }
 
     @Override
-    public void saveToBucketTag(ItemStack itemStack) {
+    public void saveToBucketTag(@NotNull ItemStack itemStack) {
         CustomData.update(DataComponents.BUCKET_ENTITY_DATA, itemStack, this::addAdditionalSaveData);
         Bucketable.saveDefaultDataToBucketTag(this, itemStack);
     }
 
     @Override
-    public void loadFromBucketTag(CompoundTag compoundTag) {
+    public void loadFromBucketTag(@NotNull CompoundTag compoundTag) {
         readAdditionalSaveData(compoundTag);
         Bucketable.loadDefaultDataFromBucketTag(this, compoundTag);
     }

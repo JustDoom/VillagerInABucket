@@ -12,7 +12,7 @@
         "issues": "https://github.com/JustDoom/VillagerInABucket/issues"
     },
     "license": "${license}",
-    "icon": "${mod_id}.png",
+    "icon": "logo.png",
     "environment": "*",
     "entrypoints": {
         "main": [

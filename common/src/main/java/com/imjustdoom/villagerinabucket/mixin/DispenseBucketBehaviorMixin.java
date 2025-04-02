@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 
-@Mixin(targets = "net/minecraft/core/dispenser/DispenseItemBehavior$6")
+@Mixin(targets = "net/minecraft/core/dispenser/DispenseItemBehavior$5")
 public abstract class DispenseBucketBehaviorMixin {
 
     @Inject(method = "execute", at = @At("HEAD"), cancellable = true)
@@ -30,8 +30,7 @@ public abstract class DispenseBucketBehaviorMixin {
             List<LivingEntity> list = serverLevel.getEntitiesOfClass(LivingEntity.class, new AABB(blockPos), EntitySelector.NO_SPECTATORS);
 
             for (LivingEntity livingEntity : list) {
-                if (!livingEntity.isAlive()) continue;
-                if (livingEntity instanceof VillagerBucketable villager) {
+                if (livingEntity.isAlive() && livingEntity instanceof VillagerBucketable villager) {
                     ItemStack stack = villager.createBucketStack();
                     livingEntity.discard();
 

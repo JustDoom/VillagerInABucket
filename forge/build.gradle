@@ -4,15 +4,14 @@ plugins {
     id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
 }
 base {
-    archivesName = "${mod_name}-forge-${minecraft_version}"
+    archivesName = "${mod_name}-forge"
 }
 mixin {
-    config("${mod_id}.mixins.json")
-    config("${mod_id}.forge.mixins.json")
+    config("${mod_id}-common.mixins.json")
 }
 jar {
     manifest {
-        attributes["MixinConfigs"] = "${mod_id}.mixins.json,${mod_id}.forge.mixins.json"
+        attributes["MixinConfigs"] = "${mod_id}-common.mixins.json"
     }
 }
 

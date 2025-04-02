@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.dispenser.BlockSource;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.npc.VillagerType;
 import net.minecraft.world.item.DispensibleContainerItem;
 import net.minecraft.world.item.ItemStack;
@@ -23,7 +24,7 @@ public class VillagerInABucket {
     public static final String MOD_ID = "villagerinabucket";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    public static final Map<VillagerType, String> VILLAGER_DATA_LIST = new HashMap<>() {
+    public static final Map<ResourceKey<VillagerType>, String> VILLAGER_DATA_LIST = new HashMap<>() {
         {
             put(VillagerType.DESERT, "desert");
             put(VillagerType.SAVANNA, "savanna");
