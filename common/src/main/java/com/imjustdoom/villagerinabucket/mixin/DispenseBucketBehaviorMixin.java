@@ -31,10 +31,9 @@ public abstract class DispenseBucketBehaviorMixin {
 
             for (LivingEntity livingEntity : list) {
                 if (livingEntity.isAlive() && livingEntity instanceof VillagerBucketable villager) {
-                    ItemStack stack = villager.createBucketStack();
+                    ItemStack bucketStack = villager.createBucketStack();
                     livingEntity.discard();
-
-                    cir.setReturnValue(villagerinabucket$consume(blockSource, itemStack, new ItemStack(stack.getItem())));
+                    cir.setReturnValue(villagerinabucket$consume(blockSource, itemStack, bucketStack));
                     return;
                 }
             }
@@ -42,9 +41,9 @@ public abstract class DispenseBucketBehaviorMixin {
     }
 
     @Unique
-    private ItemStack villagerinabucket$consume(BlockSource blockSource, ItemStack stack, ItemStack remainder) {
-        stack.shrink(1);
-        if (stack.isEmpty()) {
+    private ItemStack villagerinabucket$consume(BlockSource blockSource, ItemStack chosenStack, ItemStack remainder) {
+        chosenStack.shrink(1);
+        if (chosenStack.isEmpty()) {
             return remainder;
         } else {
             ItemStack itemStack = blockSource.blockEntity().insertItem(remainder);
@@ -54,7 +53,7 @@ public abstract class DispenseBucketBehaviorMixin {
                 blockSource.level().levelEvent(1000, blockSource.pos(), 0);
                 blockSource.level().levelEvent(2000, blockSource.pos(), direction.get3DDataValue());
             }
-            return stack;
+            return chosenStack;
         }
     }
 }
