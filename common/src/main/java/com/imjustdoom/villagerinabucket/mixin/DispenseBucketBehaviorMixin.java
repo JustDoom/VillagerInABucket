@@ -10,7 +10,6 @@ import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.DispenserBlock;
-import net.minecraft.world.level.block.entity.DispenserBlockEntity;
 import net.minecraft.world.phys.AABB;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -36,7 +35,7 @@ public abstract class DispenseBucketBehaviorMixin {
                     ItemStack stack = villager.createBucketStack();
                     livingEntity.discard();
 
-                    cir.setReturnValue(villagerinabucket$consume(blockSource, itemStack, new ItemStack(stack.getItem())));
+                    cir.setReturnValue(villagerinabucket$consume(blockSource, itemStack, stack));
                     return;
                 }
             }
