@@ -2,11 +2,8 @@ package com.imjustdoom.villagerinabucket.mixin;
 
 import com.imjustdoom.villagerinabucket.VillagerBucketable;
 import com.imjustdoom.villagerinabucket.item.ModItems;
-import com.imjustdoom.villagerinabucket.item.custom.VillagerBucket;
 import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -29,14 +26,10 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.Objects;
-import java.util.Optional;
 
 @Mixin({Villager.class, WanderingTrader.class})
 public abstract class VillagerMixin extends AbstractVillager implements Bucketable, VillagerBucketable {
@@ -53,18 +46,13 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
     @Inject(method = "mobInteract", at = @At("HEAD"), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     public void mobInteract(Player player, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResult> cir) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
-        if (itemStack.getItem() != Items.BUCKET || !isAlive()) {
+        if (level().isClientSide() || itemStack.getItem() != Items.BUCKET || !isAlive()) {
             return;
         }
 
         playSound(getPickupSound(), 1.0F, 1.0F);
-
         player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, createBucketStack(), false));
-
-        if (!level().isClientSide()) {
-            CriteriaTriggers.FILLED_BUCKET.trigger((ServerPlayer) player, getBucketItemStack());
-        }
-
+        CriteriaTriggers.FILLED_BUCKET.trigger((ServerPlayer) player, getBucketItemStack());
         discard();
         cir.setReturnValue(InteractionResult.sidedSuccess(level().isClientSide()));
     }
