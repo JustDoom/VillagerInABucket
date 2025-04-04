@@ -35,7 +35,7 @@ public abstract class DispenseBucketBehaviorMixin {
                     ItemStack stack = villager.createBucketStack();
                     livingEntity.discard();
 
-                    cir.setReturnValue(villagerinabucket$consume(blockSource, itemStack, new ItemStack(stack.getItem())));
+                    cir.setReturnValue(villagerinabucket$consume(blockSource, itemStack, stack));
                     return;
                 }
             }
