@@ -56,17 +56,13 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
     @Inject(method = "mobInteract", at = @At("HEAD"), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
     public void mobInteract(Player player, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResult> cir) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
-        if (itemStack.getItem() != Items.BUCKET || !isAlive()) {
+        if (level().isClientSide() || itemStack.getItem() != Items.BUCKET || !isAlive()) {
             return;
         }
 
         playSound(getPickupSound(), 1.0F, 1.0F);
-
         player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, createBucketStack(), false));
-        if (!level().isClientSide()) {
-            CriteriaTriggers.FILLED_BUCKET.trigger((ServerPlayer) player, getBucketItemStack());
-        }
-
+        CriteriaTriggers.FILLED_BUCKET.trigger((ServerPlayer) player, getBucketItemStack());
         discard();
         cir.setReturnValue(InteractionResult.SUCCESS);
     }
