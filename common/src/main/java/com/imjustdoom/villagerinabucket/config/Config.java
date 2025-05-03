@@ -15,7 +15,8 @@ public class Config {
     private static Path FILE_PATH;
     private static Properties PROPERTIES;
 
-    public static boolean ZOMBIE_VILLAGER;
+    public static boolean ZOMBIE_VILLAGER = true;
+    public static boolean HARM_REPUTATION = false;
 
     public static void init() throws IOException {
         PROPERTIES = new Properties();
@@ -25,7 +26,8 @@ public class Config {
         }
         PROPERTIES.load(new FileInputStream(FILE_PATH.toFile()));
 
-        ZOMBIE_VILLAGER = getBoolean("enable-zombie-villager", "true");
+        ZOMBIE_VILLAGER = getBoolean("enable-zombie-villager", String.valueOf(ZOMBIE_VILLAGER));
+        HARM_REPUTATION = getBoolean("harm-reputation", String.valueOf(HARM_REPUTATION));
 
         save();
     }
@@ -80,6 +82,7 @@ public class Config {
                 """
                         Config for Villager In A Bucket
                         'enable-zombie-villager' should the ability to pick up Zombie Villagers in buckets be enabled. Default true
+                        'harm-reputation' controls whether the reputation of the picked up villager should be harmed (Equal to punching it)
                         """);
     }
 }
