@@ -29,6 +29,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -103,15 +105,15 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
     }
 
     @Inject(at = @At("HEAD"), method = "addAdditionalSaveData")
-    public void addAdditionalSaveData(CompoundTag compound, CallbackInfo ci) {
-        super.addAdditionalSaveData(compound);
-        compound.putBoolean("FromBucket", this.fromBucket());
+    public void addAdditionalSaveData(ValueOutput valueOutput, CallbackInfo ci) {
+        super.addAdditionalSaveData(valueOutput);
+        valueOutput.putBoolean("FromBucket", this.fromBucket());
     }
 
     @Inject(at = @At("HEAD"), method = "readAdditionalSaveData")
-    public void readAdditionalSaveData(CompoundTag compound, CallbackInfo ci) {
-        super.readAdditionalSaveData(compound);
-        this.setFromBucket(compound.getBooleanOr("FromBucket", false));
+    public void readAdditionalSaveData(ValueInput valueInput, CallbackInfo ci) {
+        super.readAdditionalSaveData(valueInput);
+        this.setFromBucket(valueInput.getBooleanOr("FromBucket", false));
     }
 
     @Override
@@ -126,13 +128,13 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
 
     @Override
     public void saveToBucketTag(@NotNull ItemStack itemStack) {
-        CustomData.update(DataComponents.BUCKET_ENTITY_DATA, itemStack, this::addAdditionalSaveData);
+//        CustomData.update(DataComponents.BUCKET_ENTITY_DATA, itemStack, this::addAdditionalSaveData);
         Bucketable.saveDefaultDataToBucketTag(this, itemStack);
     }
 
     @Override
     public void loadFromBucketTag(@NotNull CompoundTag compoundTag) {
-        readAdditionalSaveData(compoundTag);
+//        readAdditionalSaveData(compoundTag);
         Bucketable.loadDefaultDataFromBucketTag(this, compoundTag);
     }
 

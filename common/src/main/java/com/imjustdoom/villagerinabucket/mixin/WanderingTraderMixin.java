@@ -23,6 +23,8 @@ import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -70,15 +72,15 @@ public abstract class WanderingTraderMixin extends AbstractVillager implements B
     }
 
     @Override
-    public void addAdditionalSaveData(@NotNull CompoundTag compound) {
-        super.addAdditionalSaveData(compound);
-        compound.putBoolean("FromBucket", this.fromBucket());
+    public void addAdditionalSaveData(@NotNull ValueOutput valueOutput) {
+        super.addAdditionalSaveData(valueOutput);
+        valueOutput.putBoolean("FromBucket", this.fromBucket());
     }
 
     @Override
-    public void readAdditionalSaveData(@NotNull CompoundTag compound) {
-        super.readAdditionalSaveData(compound);
-        this.setFromBucket(compound.getBooleanOr("FromBucket", false));
+    public void readAdditionalSaveData(@NotNull ValueInput valueInput) {
+        super.readAdditionalSaveData(valueInput);
+        this.setFromBucket(valueInput.getBooleanOr("FromBucket", false));
     }
 
     @Override
@@ -93,13 +95,13 @@ public abstract class WanderingTraderMixin extends AbstractVillager implements B
 
     @Override
     public void saveToBucketTag(@NotNull ItemStack itemStack) {
-        CustomData.update(DataComponents.BUCKET_ENTITY_DATA, itemStack, this::addAdditionalSaveData);
+//        CustomData.update(DataComponents.BUCKET_ENTITY_DATA, itemStack, this::addAdditionalSaveData);
         Bucketable.saveDefaultDataToBucketTag(this, itemStack);
     }
 
     @Override
     public void loadFromBucketTag(@NotNull CompoundTag compoundTag) {
-        readAdditionalSaveData(compoundTag);
+//        readAdditionalSaveData(compoundTag);
         Bucketable.loadDefaultDataFromBucketTag(this, compoundTag);
     }
 

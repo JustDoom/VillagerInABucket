@@ -4,6 +4,8 @@ import com.imjustdoom.villagerinabucket.VillagerBucketable;
 import com.imjustdoom.villagerinabucket.config.Config;
 import com.imjustdoom.villagerinabucket.item.ModItems;
 import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.core.HolderGetter;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -12,6 +14,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
@@ -24,8 +27,10 @@ import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.*;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -35,6 +40,10 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(ZombieVillager.class)
 public abstract class ZombieVillagerMixin extends Zombie implements Bucketable, VillagerBucketable {
+
+    @Shadow protected abstract void addAdditionalSaveData(ValueOutput valueOutput);
+
+    @Shadow protected abstract void readAdditionalSaveData(ValueInput valueInput);
 
     @Unique
     private static final EntityDataAccessor<Boolean> FROM_BUCKET = SynchedEntityData.defineId(ZombieVillagerMixin.class, EntityDataSerializers.BOOLEAN);
@@ -67,20 +76,21 @@ public abstract class ZombieVillagerMixin extends Zombie implements Bucketable, 
 
     @Inject(at = @At("HEAD"), method = "defineSynchedData")
     public void defineSynchedData(SynchedEntityData.Builder builder, CallbackInfo ci) {
+        this.defineSynchedData(builder);
         builder.define(FROM_BUCKET, false);
     }
 
-    @Inject(at = @At("HEAD"), method = "addAdditionalSaveData")
-    public void addAdditionalSaveData(CompoundTag compound, CallbackInfo ci) {
-        super.addAdditionalSaveData(compound);
-        compound.putBoolean("FromBucket", this.fromBucket());
-    }
+//    @Inject(at = @At("HEAD"), method = "addAdditionalSaveData")
+//    public void addAdditionalSaveData(ValueOutput valueOutput, CallbackInfo ci) {
+//        super.addAdditionalSaveData(valueOutput);
+//        valueOutput.putBoolean("FromBucket", this.fromBucket());
+//    }
 
-    @Inject(at = @At("HEAD"), method = "readAdditionalSaveData")
-    public void readAdditionalSaveData(CompoundTag compound, CallbackInfo ci) {
-        super.readAdditionalSaveData(compound);
-        this.setFromBucket(compound.getBooleanOr("FromBucket", false));
-    }
+//    @Inject(at = @At("HEAD"), method = "readAdditionalSaveData")
+//    public void readAdditionalSaveData(ValueInput valueInput, CallbackInfo ci) {
+//        super.readAdditionalSaveData(valueInput);
+//        this.setFromBucket(valueInput.getBooleanOr("FromBucket", false));
+//    }
 
     @Override
     public boolean fromBucket() {
@@ -94,13 +104,16 @@ public abstract class ZombieVillagerMixin extends Zombie implements Bucketable, 
 
     @Override
     public void saveToBucketTag(@NotNull ItemStack itemStack) {
-        CustomData.update(DataComponents.BUCKET_ENTITY_DATA, itemStack, this::addAdditionalSaveData);
+        CustomData.update(DataComponents.BUCKET_ENTITY_DATA, itemStack, (tag) -> {
+            this.addAdditionalSaveData();
+        });
         Bucketable.saveDefaultDataToBucketTag(this, itemStack);
     }
 
     @Override
     public void loadFromBucketTag(@NotNull CompoundTag compoundTag) {
-        readAdditionalSaveData(compoundTag);
+        TagValueInput.create(new ProblemReporter.Collector(), , compoundTag);
+//        readAdditionalSaveData(compoundTag);
         Bucketable.loadDefaultDataFromBucketTag(this, compoundTag);
     }
 
