@@ -9,7 +9,10 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntitySpawnReason;
@@ -119,10 +122,28 @@ public class VillagerBucket extends BucketItem {
     }
 
     @Override
+    public void checkExtraContent(@Nullable LivingEntity entity, Level level, ItemStack stack, BlockPos pos) {
+        if (level instanceof ServerLevel serverLevel) {
+            Mob mob = this.type.create(serverLevel, EntityType.createDefaultStackConfig(serverLevel, stack, null), pos, EntitySpawnReason.BUCKET, true, false);
+            if (mob instanceof Bucketable bucketable) {
+                CustomData customData = stack.getOrDefault(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY);
+                bucketable.loadFromBucketTag(customData.copyTag());
+                bucketable.setFromBucket(true);
+            }
+
+            if (mob != null) {
+                serverLevel.addFreshEntityWithPassengers(mob);
+                mob.playAmbientSound();
+            }
+            level.gameEvent(entity, GameEvent.ENTITY_PLACE, pos);
+        }
+    }
+
+    @Override
     public boolean emptyContents(@Nullable LivingEntity livingEntity, Level level, @NotNull BlockPos blockPos, @Nullable BlockHitResult blockHitResult) {
         BlockState blockstate = level.getBlockState(blockPos);
         if (blockstate.isAir() || blockstate.canBeReplaced(Fluids.EMPTY)) {
-            this.playEmptySound(livingEntity, level, blockPos);
+            level.playSound(livingEntity, blockPos, this.emptySound, SoundSource.NEUTRAL, 1.0F, 1.0F);
             return true;
         } else {
             return false;

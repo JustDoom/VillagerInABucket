@@ -21,7 +21,6 @@ import java.util.List;
 
 @Mixin(targets = "net/minecraft/core/dispenser/DispenseItemBehavior$5")
 public abstract class DispenseBucketBehaviorMixin {
-
     @Inject(method = "execute", at = @At("HEAD"), cancellable = true)
     private void execute(BlockSource blockSource, ItemStack itemStack, CallbackInfoReturnable<ItemStack> cir) {
         ServerLevel serverLevel = blockSource.level();
@@ -30,12 +29,14 @@ public abstract class DispenseBucketBehaviorMixin {
             List<LivingEntity> list = serverLevel.getEntitiesOfClass(LivingEntity.class, new AABB(blockPos), EntitySelector.NO_SPECTATORS);
 
             for (LivingEntity livingEntity : list) {
-                if (livingEntity.isAlive() && livingEntity instanceof VillagerBucketable villager) {
-                    ItemStack bucketStack = villager.createBucketStack();
-                    livingEntity.discard();
-                    cir.setReturnValue(villagerinabucket$consume(blockSource, itemStack, bucketStack));
-                    return;
+                if (!livingEntity.isAlive() || !(livingEntity instanceof VillagerBucketable villager)) {
+                    continue;
                 }
+
+                ItemStack bucketStack = villager.createBucketStack();
+                livingEntity.discard();
+                cir.setReturnValue(villagerinabucket$consume(blockSource, itemStack, bucketStack));
+                return;
             }
         }
     }
