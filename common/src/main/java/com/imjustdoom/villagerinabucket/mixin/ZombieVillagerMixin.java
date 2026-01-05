@@ -42,11 +42,6 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(ZombieVillager.class)
 public abstract class ZombieVillagerMixin extends Zombie implements Bucketable, VillagerBucketable {
-
-    @Shadow protected abstract void addAdditionalSaveData(ValueOutput valueOutput);
-
-    @Shadow protected abstract void readAdditionalSaveData(ValueInput valueInput);
-
     @Unique
     private static final EntityDataAccessor<Boolean> FROM_BUCKET = SynchedEntityData.defineId(ZombieVillagerMixin.class, EntityDataSerializers.BOOLEAN);
 
@@ -72,7 +67,6 @@ public abstract class ZombieVillagerMixin extends Zombie implements Bucketable, 
     public ItemStack createBucketStack() {
         ItemStack villagerBucket = getBucketItemStack();
         saveToBucketTag(villagerBucket);
-
         return villagerBucket;
     }
 
@@ -83,7 +77,6 @@ public abstract class ZombieVillagerMixin extends Zombie implements Bucketable, 
 
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
     public void addAdditionalSaveData(ValueOutput valueOutput, CallbackInfo ci) {
-        System.out.println("Save data");
         valueOutput.putBoolean("FromBucket", this.fromBucket());
     }
 
@@ -106,14 +99,16 @@ public abstract class ZombieVillagerMixin extends Zombie implements Bucketable, 
     public void saveToBucketTag(@NotNull ItemStack itemStack) {
         Bucketable.saveDefaultDataToBucketTag(this, itemStack);
         CustomData.update(DataComponents.BUCKET_ENTITY_DATA, itemStack, tag -> {
-//            tag.put("VillagerData", VillagerData.CODEC.encodeStart(NbtOps.INSTANCE, getVillagerData()).getOrThrow());
+            TagValueOutput tagValueOutput = TagValueOutput.createWithoutContext(ProblemReporter.DISCARDING);
+            addAdditionalSaveData(tagValueOutput);
+            tag.merge(tagValueOutput.buildResult());
         });
     }
 
     @Override
     public void loadFromBucketTag(@NotNull CompoundTag compoundTag) {
         Bucketable.loadDefaultDataFromBucketTag(this, compoundTag);
-//        setVillagerData(VillagerData.CODEC.parse(NbtOps.INSTANCE, compoundTag.get("VillagerData")).getOrThrow());
+        readAdditionalSaveData(TagValueInput.create(ProblemReporter.DISCARDING, this.registryAccess(), compoundTag));
     }
 
     @Override

@@ -5,19 +5,23 @@ import com.imjustdoom.villagerinabucket.config.Config;
 import com.imjustdoom.villagerinabucket.item.ModItems;
 import com.imjustdoom.villagerinabucket.item.custom.VillagerBucket;
 import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.village.ReputationEventType;
 import net.minecraft.world.entity.animal.Bucketable;
 import net.minecraft.world.entity.npc.AbstractVillager;
@@ -30,6 +34,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
@@ -50,12 +56,6 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
     @Shadow
     public abstract void onReputationEventFrom(ReputationEventType type, Entity target);
 
-    @Shadow
-    public abstract VillagerData getVillagerData();
-
-    @Shadow
-    public abstract void setVillagerData(VillagerData data);
-
     @Unique
     private static final EntityDataAccessor<Boolean> FROM_BUCKET = SynchedEntityData.defineId(VillagerMixin.class, EntityDataSerializers.BOOLEAN);
 
@@ -63,7 +63,7 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
         super(entityType, level);
     }
 
-    @Inject(method = "mobInteract", at = @At("HEAD"), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+    @Inject(method = "mobInteract", at = @At("HEAD"), cancellable = true)
     public void mobInteract(Player player, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResult> cir) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
         if (level().isClientSide() || itemStack.getItem() != Items.BUCKET || !isAlive()) {
@@ -112,7 +112,6 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
 
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
     public void addAdditionalSaveData(ValueOutput valueOutput, CallbackInfo ci) {
-        System.out.println("Save data");
         valueOutput.putBoolean("FromBucket", this.fromBucket());
     }
 
@@ -135,14 +134,16 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
     public void saveToBucketTag(@NotNull ItemStack itemStack) {
         Bucketable.saveDefaultDataToBucketTag(this, itemStack);
         CustomData.update(DataComponents.BUCKET_ENTITY_DATA, itemStack, tag -> {
-            tag.put("VillagerData", VillagerData.CODEC.encodeStart(NbtOps.INSTANCE, getVillagerData()).getOrThrow());
+            TagValueOutput tagValueOutput = TagValueOutput.createWithoutContext(ProblemReporter.DISCARDING);
+            addAdditionalSaveData(tagValueOutput);
+            tag.merge(tagValueOutput.buildResult());
         });
     }
 
     @Override
     public void loadFromBucketTag(@NotNull CompoundTag compoundTag) {
         Bucketable.loadDefaultDataFromBucketTag(this, compoundTag);
-        setVillagerData(VillagerData.CODEC.parse(NbtOps.INSTANCE, compoundTag.get("VillagerData")).getOrThrow());
+        readAdditionalSaveData(TagValueInput.create(ProblemReporter.DISCARDING, this.registryAccess(), compoundTag));
     }
 
     @Override
