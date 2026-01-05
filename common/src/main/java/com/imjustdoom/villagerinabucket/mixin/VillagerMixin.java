@@ -7,6 +7,7 @@ import com.imjustdoom.villagerinabucket.item.custom.VillagerBucket;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -46,9 +47,14 @@ import java.util.Optional;
 
 @Mixin(Villager.class)
 public abstract class VillagerMixin extends AbstractVillager implements Bucketable, VillagerBucketable {
-    @Shadow public abstract void onReputationEventFrom(ReputationEventType type, Entity target);
+    @Shadow
+    public abstract void onReputationEventFrom(ReputationEventType type, Entity target);
 
-    @Shadow public abstract int getPlayerReputation(Player player);
+    @Shadow
+    public abstract VillagerData getVillagerData();
+
+    @Shadow
+    public abstract void setVillagerData(VillagerData data);
 
     @Unique
     private static final EntityDataAccessor<Boolean> FROM_BUCKET = SynchedEntityData.defineId(VillagerMixin.class, EntityDataSerializers.BOOLEAN);
@@ -99,20 +105,19 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
         return villagerBucket;
     }
 
-    @Inject(at = @At("HEAD"), method = "defineSynchedData")
+    @Inject(method = "defineSynchedData", at = @At("TAIL"))
     public void defineSynchedData(SynchedEntityData.Builder builder, CallbackInfo ci) {
         builder.define(FROM_BUCKET, false);
     }
 
-    @Inject(at = @At("HEAD"), method = "addAdditionalSaveData")
+    @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
     public void addAdditionalSaveData(ValueOutput valueOutput, CallbackInfo ci) {
-        super.addAdditionalSaveData(valueOutput);
+        System.out.println("Save data");
         valueOutput.putBoolean("FromBucket", this.fromBucket());
     }
 
-    @Inject(at = @At("HEAD"), method = "readAdditionalSaveData")
+    @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
     public void readAdditionalSaveData(ValueInput valueInput, CallbackInfo ci) {
-        super.readAdditionalSaveData(valueInput);
         this.setFromBucket(valueInput.getBooleanOr("FromBucket", false));
     }
 
@@ -128,14 +133,16 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
 
     @Override
     public void saveToBucketTag(@NotNull ItemStack itemStack) {
-//        CustomData.update(DataComponents.BUCKET_ENTITY_DATA, itemStack, this::addAdditionalSaveData);
         Bucketable.saveDefaultDataToBucketTag(this, itemStack);
+        CustomData.update(DataComponents.BUCKET_ENTITY_DATA, itemStack, tag -> {
+            tag.put("VillagerData", VillagerData.CODEC.encodeStart(NbtOps.INSTANCE, getVillagerData()).getOrThrow());
+        });
     }
 
     @Override
     public void loadFromBucketTag(@NotNull CompoundTag compoundTag) {
-//        readAdditionalSaveData(compoundTag);
         Bucketable.loadDefaultDataFromBucketTag(this, compoundTag);
+        setVillagerData(VillagerData.CODEC.parse(NbtOps.INSTANCE, compoundTag.get("VillagerData")).getOrThrow());
     }
 
     @Override

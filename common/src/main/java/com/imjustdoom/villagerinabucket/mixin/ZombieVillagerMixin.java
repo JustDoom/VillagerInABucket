@@ -8,6 +8,7 @@ import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -21,6 +22,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.Bucketable;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.monster.ZombieVillager;
+import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
@@ -74,23 +76,21 @@ public abstract class ZombieVillagerMixin extends Zombie implements Bucketable, 
         return villagerBucket;
     }
 
-    @Inject(at = @At("HEAD"), method = "defineSynchedData")
+    @Inject(method = "defineSynchedData", at = @At("TAIL"))
     public void defineSynchedData(SynchedEntityData.Builder builder, CallbackInfo ci) {
-        this.defineSynchedData(builder);
         builder.define(FROM_BUCKET, false);
     }
 
-//    @Inject(at = @At("HEAD"), method = "addAdditionalSaveData")
-//    public void addAdditionalSaveData(ValueOutput valueOutput, CallbackInfo ci) {
-//        super.addAdditionalSaveData(valueOutput);
-//        valueOutput.putBoolean("FromBucket", this.fromBucket());
-//    }
+    @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
+    public void addAdditionalSaveData(ValueOutput valueOutput, CallbackInfo ci) {
+        System.out.println("Save data");
+        valueOutput.putBoolean("FromBucket", this.fromBucket());
+    }
 
-//    @Inject(at = @At("HEAD"), method = "readAdditionalSaveData")
-//    public void readAdditionalSaveData(ValueInput valueInput, CallbackInfo ci) {
-//        super.readAdditionalSaveData(valueInput);
-//        this.setFromBucket(valueInput.getBooleanOr("FromBucket", false));
-//    }
+    @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
+    public void readAdditionalSaveData(ValueInput valueInput, CallbackInfo ci) {
+        this.setFromBucket(valueInput.getBooleanOr("FromBucket", false));
+    }
 
     @Override
     public boolean fromBucket() {
@@ -104,17 +104,16 @@ public abstract class ZombieVillagerMixin extends Zombie implements Bucketable, 
 
     @Override
     public void saveToBucketTag(@NotNull ItemStack itemStack) {
-        CustomData.update(DataComponents.BUCKET_ENTITY_DATA, itemStack, (tag) -> {
-            this.addAdditionalSaveData();
-        });
         Bucketable.saveDefaultDataToBucketTag(this, itemStack);
+        CustomData.update(DataComponents.BUCKET_ENTITY_DATA, itemStack, tag -> {
+//            tag.put("VillagerData", VillagerData.CODEC.encodeStart(NbtOps.INSTANCE, getVillagerData()).getOrThrow());
+        });
     }
 
     @Override
     public void loadFromBucketTag(@NotNull CompoundTag compoundTag) {
-        TagValueInput.create(new ProblemReporter.Collector(), , compoundTag);
-//        readAdditionalSaveData(compoundTag);
         Bucketable.loadDefaultDataFromBucketTag(this, compoundTag);
+//        setVillagerData(VillagerData.CODEC.parse(NbtOps.INSTANCE, compoundTag.get("VillagerData")).getOrThrow());
     }
 
     @Override
