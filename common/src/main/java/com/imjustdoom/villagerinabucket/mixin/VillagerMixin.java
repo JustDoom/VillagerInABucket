@@ -90,7 +90,7 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
             return villagerBucket;
         }
 
-        Optional<VillagerData> optional = customData.read(VillagerBucket.CODEC).result();
+        Optional<VillagerData> optional = customData.copyTag().read(VillagerBucket.CODEC);
         if (optional.isPresent()) {
             VillagerData data = optional.get();
             String type = data.type().getRegisteredName().split(":")[1];

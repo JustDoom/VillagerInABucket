@@ -68,7 +68,7 @@ public class VillagerBucket extends BucketItem {
         CustomData customData = itemStack.getOrDefault(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY);
         CustomData oldData = itemStack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
         if (customData.isEmpty() && !oldData.isEmpty()) {
-            oldData.read(CODEC).result().ifPresent(villagerData -> itemStack.set(DataComponents.BUCKET_ENTITY_DATA, oldData));
+            oldData.copyTag().read(CODEC).ifPresent(villagerData -> itemStack.set(DataComponents.BUCKET_ENTITY_DATA, oldData));
         }
 
         BlockPos blockPos1 = level.getBlockState(blockPos).getCollisionShape(level, blockPos).isEmpty() ? blockPos : blockPos.relative(blockHitResult.getDirection());
@@ -101,7 +101,7 @@ public class VillagerBucket extends BucketItem {
             }
         }
 
-        Optional<VillagerData> optional = customData.read(CODEC).result();
+        Optional<VillagerData> optional = customData.copyTag().read(CODEC);
         if (optional.isPresent()) {
             VillagerData data = optional.get();
             ChatFormatting[] chatFormatting = new ChatFormatting[]{ChatFormatting.ITALIC, ChatFormatting.GRAY};
