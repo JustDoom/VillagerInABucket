@@ -1,0 +1,47 @@
+plugins {
+    id 'java'
+}
+
+group = project.property('group')
+version = project.property('version')
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(project.property('java_version'))
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'papermc'
+        url = 'https://repo.papermc.io/repository/maven-public/'
+    }
+}
+
+dependencies {
+    compileOnly 'io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT'
+}
+
+base {
+    archivesName = "${project.property('mod_id')}-folia"
+}
+
+jar {
+    from(rootProject.file('LICENSE')) {
+        rename { "${it}_${project.property('mod_name')}" }
+    }
+}
+
+processResources {
+    var expandProps = [
+            'version'    : version,
+            'description': project.property('description'),
+            'mod_name'   : project.property('mod_name'),
+            'mod_author' : project.property('mod_author'),
+    ]
+
+    filesMatching('paper-plugin.yml') {
+        expand expandProps
+    }
+
+    inputs.properties(expandProps)
+}

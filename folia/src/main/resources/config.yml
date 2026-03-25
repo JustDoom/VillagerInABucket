@@ -1,0 +1,8 @@
+# VillagerInABucket - Folia Plugin Configuration
+
+# Should the ability to pick up Zombie Villagers in buckets be enabled?
+enable-zombie-villager: true
+
+# Controls whether the reputation of the picked up villager should be harmed
+# (equivalent to punching the villager)
+harm-reputation: false

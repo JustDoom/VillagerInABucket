@@ -1,0 +1,7 @@
+name: VillagerInABucket
+version: ${version}
+main: com.imjustdoom.villagerinabucket.folia.VillagerInABucketPlugin
+description: ${description}
+author: ${mod_author}
+api-version: '1.21'
+folia-supported: true
