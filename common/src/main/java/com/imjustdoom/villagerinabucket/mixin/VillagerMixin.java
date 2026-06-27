@@ -129,7 +129,7 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
     public void saveToBucketTag(@NotNull ItemStack itemStack) {
         Bucketable.saveDefaultDataToBucketTag(this, itemStack);
         CustomData.update(DataComponents.BUCKET_ENTITY_DATA, itemStack, tag -> {
-            TagValueOutput tagValueOutput = TagValueOutput.createWithoutContext(ProblemReporter.DISCARDING);
+            TagValueOutput tagValueOutput = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, this.registryAccess());
             addAdditionalSaveData(tagValueOutput);
             tag.merge(tagValueOutput.buildResult());
         });
