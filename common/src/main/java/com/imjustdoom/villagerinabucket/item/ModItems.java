@@ -3,8 +3,8 @@ package com.imjustdoom.villagerinabucket.item;
 import com.imjustdoom.villagerinabucket.VillagerInABucket;
 import com.imjustdoom.villagerinabucket.item.custom.VillagerBucket;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EntityType;
@@ -23,7 +23,7 @@ public class ModItems {
 
     public static ImmutablePair<ResourceKey<Item>, Item> registerBucketItem(String id, Class<?> clazz, EntityType<?> entityType, SoundEvent soundEvent, Item.Properties properties) {
         try {
-            ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(VillagerInABucket.MOD_ID, id));
+            ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(VillagerInABucket.MOD_ID, id));
             return new ImmutablePair<>(key, (Item) clazz.getConstructor(EntityType.class, SoundEvent.class, Item.Properties.class).newInstance(entityType, soundEvent, properties.setId(key)));
         } catch (InvocationTargetException | InstantiationException | NoSuchMethodException | IllegalAccessException e) {
             throw new RuntimeException(e);
