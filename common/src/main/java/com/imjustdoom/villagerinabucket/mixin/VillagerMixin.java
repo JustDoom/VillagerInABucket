@@ -11,7 +11,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -20,14 +19,13 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.ai.Brain;
-import net.minecraft.world.entity.ai.behavior.AcquirePoi;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.village.ReputationEventType;
 import net.minecraft.world.entity.animal.Bucketable;
 import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.npc.villager.VillagerData;
+import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
@@ -35,7 +33,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.CustomModelData;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
@@ -59,6 +56,12 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
 
     @Shadow
     public abstract void releasePoi(MemoryModuleType<GlobalPos> moduleType);
+
+    @Shadow
+    public abstract VillagerData getVillagerData();
+
+    @Shadow
+    public abstract void setVillagerData(VillagerData villagerData);
 
     @Unique
     private static final EntityDataAccessor<Boolean> FROM_BUCKET = SynchedEntityData.defineId(VillagerMixin.class, EntityDataSerializers.BOOLEAN);
@@ -86,6 +89,23 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
 
     @Override
     public ItemStack createBucketStack() {
+        // Free the brain on pickup since it is likely it won't need to reuse it.
+        // If it does, it just yoinks the braincells back
+        for (MemoryModuleType<GlobalPos> poi : List.of(MemoryModuleType.HOME, MemoryModuleType.JOB_SITE, MemoryModuleType.POTENTIAL_JOB_SITE, MemoryModuleType.MEETING_POINT)) {
+            releasePoi(poi);
+            getBrain().eraseMemory(poi);
+        }
+
+        // Check if the villager doesn't have the profession stamped into its existence. Because if it doesn't when
+        // it is placed back down it will reset and start looking for a new job block. Which can cause confusion
+        // since the bucket description will say it has a profession. So just reset on pickup
+        VillagerData villagerData = getVillagerData();
+        if (!villagerData.profession().is(VillagerProfession.NONE)
+                && !villagerData.profession().is(VillagerProfession.NITWIT)
+                && getVillagerXp() == 0 && villagerData.level() <= 1) {
+            setVillagerData(villagerData.withProfession(registryAccess(), VillagerProfession.NONE));
+        }
+
         ItemStack villagerBucket = getBucketItemStack();
         saveToBucketTag(villagerBucket);
 
@@ -148,55 +168,6 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
     public void loadFromBucketTag(@NotNull CompoundTag compoundTag) {
         Bucketable.loadDefaultDataFromBucketTag(this, compoundTag);
         readAdditionalSaveData(TagValueInput.create(ProblemReporter.DISCARDING, this.registryAccess(), compoundTag));
-
-        // Clear home, job location etc when moved far away to avoid the villager trying to walk all the way back home
-        // or stop job reassignment issues
-        forgetDistantPoi(MemoryModuleType.HOME);
-        forgetDistantPoi(MemoryModuleType.JOB_SITE);
-        forgetDistantPoi(MemoryModuleType.POTENTIAL_JOB_SITE);
-        forgetDistantPoi(MemoryModuleType.MEETING_POINT);
-    }
-
-    /**
-     * Forget POI info if the distance is greater than the configured forget value.
-     * This is used to solve Villagers not always forgetting their home location or job data.
-     * It sometimes works but if the villager thinks it is able to return home it will keep attempting it
-     */
-    @Unique
-    private void forgetDistantPoi(MemoryModuleType<GlobalPos> memory) {
-        if (!(this.level() instanceof ServerLevel serverLevel)) {
-            return;
-        }
-        Brain<?> brain = this.getBrain();
-        GlobalPos pos = brain.getMemory(memory).orElse(null);
-        if (pos == null) {
-            return;
-        }
-
-        // Check if the villager in within keep poi distance
-        if (pos.dimension().equals(serverLevel.dimension()) && pos.pos().closerThan(this.blockPosition(), Config.RESET_POI_DISTANCE)) {
-            return;
-        }
-
-        // Check if the poi is claimed by another villager just in case. Since while in the bucket one can take over
-        // so we don't want to blindly clear it
-        if (!poiClaimedByOtherVillager(serverLevel, memory, pos)) {
-            this.releasePoi(memory);
-        }
-        brain.eraseMemory(memory);
-    }
-
-    /**
-     * Check if the poi is actually claimed by another villager or not
-     */
-    @Unique
-    private boolean poiClaimedByOtherVillager(ServerLevel level, MemoryModuleType<GlobalPos> memory, GlobalPos pos) {
-        ServerLevel poiLevel = level.getServer().getLevel(pos.dimension());
-        if (poiLevel == null) {
-            return false;
-        }
-        return !poiLevel.getEntitiesOfClass(Villager.class, new AABB(pos.pos()).inflate(AcquirePoi.SCAN_RANGE),
-                other -> other != (Object) this && pos.equals(other.getBrain().getMemory(memory).orElse(null))).isEmpty();
     }
 
     @Override
