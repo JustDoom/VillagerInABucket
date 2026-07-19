@@ -6,9 +6,6 @@ import com.imjustdoom.villagerinabucket.item.ModItems;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -41,7 +38,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 @Mixin(ZombieVillager.class)
 public abstract class ZombieVillagerMixin extends Zombie implements Bucketable, VillagerBucketable {
     @Unique
-    private static final EntityDataAccessor<Boolean> FROM_BUCKET = SynchedEntityData.defineId(ZombieVillagerMixin.class, EntityDataSerializers.BOOLEAN);
+    private boolean villagerinabucket$fromBucket;
 
     public ZombieVillagerMixin(EntityType<? extends Zombie> entityType, Level level) {
         super(entityType, level);
@@ -68,11 +65,6 @@ public abstract class ZombieVillagerMixin extends Zombie implements Bucketable, 
         return villagerBucket;
     }
 
-    @Inject(method = "defineSynchedData", at = @At("TAIL"))
-    public void defineSynchedData(SynchedEntityData.Builder builder, CallbackInfo ci) {
-        builder.define(FROM_BUCKET, false);
-    }
-
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
     public void addAdditionalSaveData(ValueOutput valueOutput, CallbackInfo ci) {
         valueOutput.putBoolean("FromBucket", this.fromBucket());
@@ -85,12 +77,12 @@ public abstract class ZombieVillagerMixin extends Zombie implements Bucketable, 
 
     @Override
     public boolean fromBucket() {
-        return getEntityData().get(FROM_BUCKET);
+        return this.villagerinabucket$fromBucket;
     }
 
     @Override
     public void setFromBucket(boolean fromBucket) {
-        getEntityData().set(FROM_BUCKET, fromBucket);
+        this.villagerinabucket$fromBucket = fromBucket;
     }
 
     @Override

@@ -5,9 +5,6 @@ import com.imjustdoom.villagerinabucket.item.ModItems;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -39,7 +36,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(WanderingTrader.class)
 public abstract class WanderingTraderMixin extends AbstractVillager implements Bucketable, VillagerBucketable {
     @Unique
-    private static final EntityDataAccessor<Boolean> FROM_BUCKET = SynchedEntityData.defineId(WanderingTraderMixin.class, EntityDataSerializers.BOOLEAN);
+    private boolean villagerinabucket$fromBucket;
 
     public WanderingTraderMixin(EntityType<? extends AbstractVillager> entityType, Level level) {
         super(entityType, level);
@@ -66,12 +63,6 @@ public abstract class WanderingTraderMixin extends AbstractVillager implements B
         return villagerBucket;
     }
 
-    @Override
-    public void defineSynchedData(SynchedEntityData.@NotNull Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(FROM_BUCKET, false);
-    }
-
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
     public void addAdditionalSaveData(ValueOutput output, CallbackInfo ci) {
         output.putBoolean("FromBucket", this.fromBucket());
@@ -84,12 +75,12 @@ public abstract class WanderingTraderMixin extends AbstractVillager implements B
 
     @Override
     public boolean fromBucket() {
-        return getEntityData().get(FROM_BUCKET);
+        return this.villagerinabucket$fromBucket;
     }
 
     @Override
     public void setFromBucket(boolean fromBucket) {
-        getEntityData().set(FROM_BUCKET, fromBucket);
+        this.villagerinabucket$fromBucket = fromBucket;
     }
 
     @Override

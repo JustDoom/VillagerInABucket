@@ -3,7 +3,7 @@ package com.imjustdoom.villagerinabucket.fabric;
 import com.imjustdoom.villagerinabucket.VillagerInABucket;
 import com.imjustdoom.villagerinabucket.item.ModItems;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -23,7 +23,7 @@ import java.util.List;
 
 public class VillagerInABucketFabric implements ModInitializer {
 
-    private static final CreativeModeTab VILLAGERINABUCKET_TAB = FabricItemGroup.builder()
+    private static final CreativeModeTab VILLAGERINABUCKET_TAB = FabricCreativeModeTab.builder()
             .icon(() -> new ItemStack(ModItems.VILLAGER_IN_A_BUCKET.right))
             .title(Component.translatable("category.villagerinabucket.villagerinabucket_tab"))
             .displayItems((params, output) -> {

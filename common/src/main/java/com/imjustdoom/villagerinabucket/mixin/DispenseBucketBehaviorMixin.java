@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 
-@Mixin(targets = "net/minecraft/core/dispenser/DispenseItemBehavior$5")
+@Mixin(targets = "net/minecraft/core/dispenser/DispenseItemBehavior$4")
 public abstract class DispenseBucketBehaviorMixin {
     @Inject(method = "execute", at = @At("HEAD"), cancellable = true)
     private void execute(BlockSource blockSource, ItemStack itemStack, CallbackInfoReturnable<ItemStack> cir) {

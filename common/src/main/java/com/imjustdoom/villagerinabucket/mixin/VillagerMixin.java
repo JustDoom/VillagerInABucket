@@ -8,9 +8,6 @@ import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -64,7 +61,7 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
     public abstract void setVillagerData(VillagerData villagerData);
 
     @Unique
-    private static final EntityDataAccessor<Boolean> FROM_BUCKET = SynchedEntityData.defineId(VillagerMixin.class, EntityDataSerializers.BOOLEAN);
+    private boolean villagerinabucket$fromBucket;
 
     public VillagerMixin(EntityType<? extends AbstractVillager> entityType, Level level) {
         super(entityType, level);
@@ -129,11 +126,6 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
         return villagerBucket;
     }
 
-    @Inject(method = "defineSynchedData", at = @At("TAIL"))
-    public void defineSynchedData(SynchedEntityData.Builder builder, CallbackInfo ci) {
-        builder.define(FROM_BUCKET, false);
-    }
-
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
     public void addAdditionalSaveData(ValueOutput valueOutput, CallbackInfo ci) {
         valueOutput.putBoolean("FromBucket", this.fromBucket());
@@ -146,12 +138,12 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
 
     @Override
     public boolean fromBucket() {
-        return getEntityData().get(FROM_BUCKET);
+        return this.villagerinabucket$fromBucket;
     }
 
     @Override
     public void setFromBucket(boolean fromBucket) {
-        getEntityData().set(FROM_BUCKET, fromBucket);
+        this.villagerinabucket$fromBucket = fromBucket;
     }
 
     @Override
