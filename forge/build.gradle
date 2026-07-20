@@ -5,11 +5,7 @@ plugins {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.release = 21
-}
-
-configurations.matching { it.name in ['compileClasspath', 'runtimeClasspath'] }.configureEach {
-    attributes.attribute(org.gradle.api.attributes.java.TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 25)
+    options.release = 25
 }
 
 jar {
