@@ -89,7 +89,6 @@ public class VillagerBucket extends MobBucketItem {
             if (entityType != EntityType.VILLAGER) {
                 list.add(Component.translatable("Type: " + I18n.get(entityType.getDescriptionId())).withStyle(chatFormattings));
             }
-            ;
         });
 
         if (data.contains("level")) {
