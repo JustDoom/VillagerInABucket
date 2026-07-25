@@ -50,7 +50,7 @@ public abstract class DispenseBucketBehaviorMixin {
         } else {
             if (blockSource.blockEntity().addItem(remainder) < 0) {
                 Direction direction = blockSource.state().getValue(DispenserBlock.FACING);
-                DefaultDispenseItemBehavior.spawnItem(blockSource.level(), stack, 6, direction, DispenserBlock.getDispensePosition(blockSource));
+                DefaultDispenseItemBehavior.spawnItem(blockSource.level(), remainder, 6, direction, DispenserBlock.getDispensePosition(blockSource));
                 blockSource.level().levelEvent(1000, blockSource.pos(), 0);
                 blockSource.level().levelEvent(2000, blockSource.pos(), direction.get3DDataValue());
             }

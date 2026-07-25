@@ -1,13 +1,12 @@
 package com.imjustdoom.villagerinabucket.item.custom;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
@@ -16,8 +15,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.animal.Bucketable;
-import net.minecraft.world.entity.npc.AbstractVillager;
-import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.MobBucketItem;
@@ -44,44 +41,38 @@ public class VillagerBucket extends MobBucketItem {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
         BlockHitResult blockHitResult = getPlayerPOVHitResult(level, player, ClipContext.Fluid.NONE);
-        if (blockHitResult.getType() == HitResult.Type.MISS) {
+        if (blockHitResult.getType() == HitResult.Type.MISS || blockHitResult.getType() != HitResult.Type.BLOCK) {
             return InteractionResultHolder.pass(itemStack);
-        } else if (blockHitResult.getType() != HitResult.Type.BLOCK) {
-            return InteractionResultHolder.pass(itemStack);
-        } else {
-            BlockPos blockPos = blockHitResult.getBlockPos();
-            if (level.mayInteract(player, blockPos)) {
+        }
+        BlockPos blockPos = blockHitResult.getBlockPos();
+        if (!level.mayInteract(player, blockPos)) {
+            return InteractionResultHolder.fail(itemStack);
+        }
 
-                if (level instanceof ServerLevel) {
-                    CompoundTag compoundTag = itemStack.getTag();
-                    if (compoundTag == null) {
-                        checkExtraContent(player, level, itemStack, blockPos);
-                    } else {
-                        Optional<EntityType<?>> optionalEntityType = EntityType.byString(itemStack.getTag().getString("type"));
-
-                        if (optionalEntityType.isPresent()) {
-                            Entity entity = optionalEntityType.get().spawn((ServerLevel) level, itemStack, null, blockPos, MobSpawnType.BUCKET, true, false);
-                            if (entity instanceof Bucketable bucketable) {
-                                bucketable.loadFromBucketTag(itemStack.getOrCreateTag());
-                                bucketable.setFromBucket(true);
-                            }
-                        } else {
-                            checkExtraContent(player, level, itemStack, blockPos);
-                        }
-                        level.gameEvent(player, GameEvent.ENTITY_PLACE, blockPos);
-                    }
-                }
-
-                if (player instanceof ServerPlayer) {
-                    CriteriaTriggers.PLACED_BLOCK.trigger((ServerPlayer) player, blockPos, itemStack);
-                }
-                // TODO: Try make bucket with no nbt make villager type the same as biome spawned in
-                player.awardStat(Stats.ITEM_USED.get(this));
-                return InteractionResultHolder.sidedSuccess(getEmptySuccessItem(itemStack, player), level.isClientSide());
+        if (level instanceof ServerLevel serverLevel) {
+            CompoundTag compoundTag = itemStack.getTag();
+            if (compoundTag == null) {
+                checkExtraContent(player, serverLevel, itemStack, blockPos);
             } else {
-                return InteractionResultHolder.fail(itemStack);
+                Optional<EntityType<?>> optionalEntityType = EntityType.byString(itemStack.getTag().getString("type"));
+
+                if (optionalEntityType.isPresent()) {
+                    BlockPos blockPos1 = level.getBlockState(blockPos).getCollisionShape(level, blockPos).isEmpty() ? blockPos : blockPos.relative(blockHitResult.getDirection());
+                    Entity entity = optionalEntityType.get().spawn(serverLevel, itemStack, null, blockPos, MobSpawnType.BUCKET, true, blockPos != blockPos1 && blockHitResult.getDirection() == Direction.UP);
+                    if (entity instanceof Bucketable bucketable) {
+                        bucketable.loadFromBucketTag(itemStack.getOrCreateTag());
+                        bucketable.setFromBucket(true);
+                    }
+                } else {
+                    checkExtraContent(player, serverLevel, itemStack, blockPos);
+                }
+                serverLevel.gameEvent(player, GameEvent.ENTITY_PLACE, blockPos);
             }
         }
+
+        // TODO: Try make bucket with no nbt make villager type the same as biome spawned in
+        player.awardStat(Stats.ITEM_USED.get(this));
+        return InteractionResultHolder.sidedSuccess(getEmptySuccessItem(itemStack, player), level.isClientSide());
     }
 
     @Override
@@ -99,7 +90,8 @@ public class VillagerBucket extends MobBucketItem {
         optionalEntityType.ifPresent(entityType -> {
             if (entityType != EntityType.VILLAGER) {
                 list.add(Component.translatable("Type: " + I18n.get(entityType.getDescriptionId())).withStyle(chatFormattings));
-            };
+            }
+            ;
         });
 
         if (data.contains("level")) {
