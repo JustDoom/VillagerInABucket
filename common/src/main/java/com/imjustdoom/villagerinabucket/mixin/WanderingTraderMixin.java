@@ -1,29 +1,23 @@
 package com.imjustdoom.villagerinabucket.mixin;
 
+
 import com.imjustdoom.villagerinabucket.VillagerBucketable;
-import com.imjustdoom.villagerinabucket.config.Config;
 import com.imjustdoom.villagerinabucket.item.ModItems;
 import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.core.GlobalPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.ai.memory.MemoryModuleType;
-import net.minecraft.world.entity.ai.village.ReputationEventType;
 import net.minecraft.world.entity.animal.Bucketable;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.npc.VillagerData;
-import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.npc.WanderingTrader;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
@@ -37,28 +31,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.util.List;
-
-@Mixin(Villager.class)
-public abstract class VillagerMixin extends AbstractVillager implements Bucketable, VillagerBucketable {
-    @Shadow
-    public abstract void releasePoi(MemoryModuleType<GlobalPos> moduleType);
-
-    @Shadow
-    public abstract VillagerData getVillagerData();
-
-    @Shadow
-    public abstract void setVillagerData(VillagerData villagerData);
-
-    @Shadow
-    public abstract void onReputationEventFrom(ReputationEventType type, Entity target);
-
+@Mixin(WanderingTrader.class)
+public abstract class WanderingTraderMixin extends AbstractVillager implements Bucketable, VillagerBucketable {
     @Shadow(remap = false) public abstract void readAdditionalSaveData(CompoundTag arg);
     @Shadow(remap = false) public abstract void addAdditionalSaveData(CompoundTag arg);
 
     private static final EntityDataAccessor<Boolean> FROM_BUCKET;
 
-    public VillagerMixin(EntityType<? extends AbstractVillager> entityType, Level level) {
+    public WanderingTraderMixin(EntityType<? extends AbstractVillager> entityType, Level level) {
         super(entityType, level);
     }
 
@@ -70,9 +50,6 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
         }
 
         playSound(getPickupSound(), 1.0F, 1.0F);
-        if (Config.HARM_REPUTATION) {
-            onReputationEventFrom(ReputationEventType.VILLAGER_HURT, player);
-        }
         player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, createBucketStack(), false));
         CriteriaTriggers.FILLED_BUCKET.trigger((ServerPlayer) player, getBucketItemStack());
         discard();
@@ -81,42 +58,8 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
 
     @Override
     public ItemStack createBucketStack() {
-        // Free the brain on pickup since it is likely it won't need to reuse it.
-        // If it does, it just yoinks the braincells back
-        for (MemoryModuleType<GlobalPos> poi : List.of(MemoryModuleType.HOME, MemoryModuleType.JOB_SITE, MemoryModuleType.POTENTIAL_JOB_SITE, MemoryModuleType.MEETING_POINT)) {
-            releasePoi(poi);
-            getBrain().eraseMemory(poi);
-        }
-
-        // Check if the villager doesn't have the profession stamped into its existence. Because if it doesn't when
-        // it is placed back down it will reset and start looking for a new job block. Which can cause confusion
-        // since the bucket description will say it has a profession. So just reset on pickup
-        VillagerData villagerData = getVillagerData();
-        if (villagerData.getProfession() != VillagerProfession.NONE
-                && villagerData.getProfession() != VillagerProfession.NITWIT
-                && getVillagerXp() == 0 && villagerData.getLevel() <= 1) {
-            setVillagerData(villagerData.setProfession(VillagerProfession.NONE));
-        }
-
         ItemStack villagerBucket = getBucketItemStack();
         saveToBucketTag(villagerBucket);
-
-        CompoundTag tag = villagerBucket.getOrCreateTag();
-        ResourceLocation resourceLocation = EntityType.getKey(getType());
-        tag.putString("type", resourceLocation.getNamespace() + ":" + resourceLocation.getPath());
-        if (tag.getCompound("VillagerData").contains("type")) {
-            String type = tag.getCompound("VillagerData").getString("type").split(":")[1];
-            if (type.equals("desert")) {
-                tag.putInt("CustomModelData", 1);
-            } else if (type.equals("savanna")) {
-                tag.putInt("CustomModelData", 2);
-            } else if (type.equals("snow")) {
-                tag.putInt("CustomModelData", 3);
-            } else if (type.equals("swamp")) {
-                tag.putInt("CustomModelData", 4);
-            }
-        }
-
         return villagerBucket;
     }
 
@@ -145,12 +88,12 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
 
     @Override
     public @NotNull ItemStack getBucketItemStack() {
-        return new ItemStack(ModItems.VILLAGER_IN_A_BUCKET);
+        return new ItemStack(ModItems.WANDERING_TRADER_IN_A_BUCKET);
     }
 
     @Override
     public @NotNull SoundEvent getPickupSound() {
-        return SoundEvents.VILLAGER_TRADE;
+        return SoundEvents.WANDERING_TRADER_NO;
     }
 
     static {
