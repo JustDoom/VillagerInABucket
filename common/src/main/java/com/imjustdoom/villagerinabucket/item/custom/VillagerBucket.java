@@ -1,15 +1,11 @@
 package com.imjustdoom.villagerinabucket.item.custom;
 
 import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.MapDecoder;
 import net.minecraft.ChatFormatting;
-import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
@@ -47,32 +43,27 @@ public class VillagerBucket extends MobBucketItem {
     public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
         BlockHitResult blockHitResult = getPlayerPOVHitResult(level, player, ClipContext.Fluid.NONE);
-        if (blockHitResult.getType() == HitResult.Type.MISS) {
+        if (blockHitResult.getType() == HitResult.Type.MISS || blockHitResult.getType() != HitResult.Type.BLOCK) {
             return InteractionResultHolder.pass(itemStack);
-        } else if (blockHitResult.getType() != HitResult.Type.BLOCK) {
-            return InteractionResultHolder.pass(itemStack);
-        } else {
-            BlockPos blockPos = blockHitResult.getBlockPos();
-            if (level.mayInteract(player, blockPos)) {
+        }
 
-                if (itemStack.getOrDefault(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY).isEmpty()) {
-                    CustomData oldData = itemStack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
-                    if (!oldData.isEmpty()) {
-                        oldData.read(CODEC).result().ifPresent(villagerData -> itemStack.set(DataComponents.BUCKET_ENTITY_DATA, oldData));
-                    }
-                }
+        BlockPos blockPos = blockHitResult.getBlockPos();
+        if (!level.mayInteract(player, blockPos)) {
+            return InteractionResultHolder.fail(itemStack);
+        }
 
-                checkExtraContent(player, level, itemStack, blockPos);
-                if (player instanceof ServerPlayer) {
-                    CriteriaTriggers.PLACED_BLOCK.trigger((ServerPlayer) player, blockPos, itemStack);
-                }
-                // TODO: Try make bucket with no nbt make villager type the same as biome spawned in
-                player.awardStat(Stats.ITEM_USED.get(this));
-                return InteractionResultHolder.sidedSuccess(getEmptySuccessItem(itemStack, player), level.isClientSide());
-            } else {
-                return InteractionResultHolder.fail(itemStack);
+        if (itemStack.getOrDefault(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY).isEmpty()) {
+            CustomData oldData = itemStack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
+            if (!oldData.isEmpty()) {
+                oldData.read(CODEC).result().ifPresent(villagerData -> itemStack.set(DataComponents.BUCKET_ENTITY_DATA, oldData));
             }
         }
+
+        checkExtraContent(player, level, itemStack, blockPos);
+
+        // TODO: Try make bucket with no nbt make villager type the same as biome spawned in
+        player.awardStat(Stats.ITEM_USED.get(this));
+        return InteractionResultHolder.sidedSuccess(getEmptySuccessItem(itemStack, player), level.isClientSide());
     }
 
     @Override
