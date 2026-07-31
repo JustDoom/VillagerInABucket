@@ -64,38 +64,19 @@ public abstract class WanderingTraderMixin extends AbstractVillager implements B
         return villagerBucket;
     }
 
-    protected void defineSynchedData(SynchedEntityData.Builder builder, CallbackInfo ci) {
-        builder.define(FROM_BUCKET, false);
-        super.defineSynchedData(builder);
-    }
-
-    @Inject(at = @At("HEAD"), method = "addAdditionalSaveData")
-    public void addAdditionalSaveData(CompoundTag compound, CallbackInfo ci) {
-        super.addAdditionalSaveData(compound);
-        compound.putBoolean("FromBucket", this.fromBucket());
-    }
-
-    @Inject(at = @At("HEAD"), method = "readAdditionalSaveData")
-    public void readAdditionalSaveData(CompoundTag compound, CallbackInfo ci) {
-        super.readAdditionalSaveData(compound);
-        this.setFromBucket(compound.getBoolean("FromBucket"));
-    }
-
     @Override
     public void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(FROM_BUCKET, false);
     }
 
-    @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
-        super.addAdditionalSaveData(compound);
+    @Inject(at = @At("TAIL"), method = "addAdditionalSaveData")
+    public void addAdditionalSaveData(CompoundTag compound, CallbackInfo ci) {
         compound.putBoolean("FromBucket", this.fromBucket());
     }
 
-    @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
-        super.readAdditionalSaveData(compound);
+    @Inject(at = @At("TAIL"), method = "readAdditionalSaveData")
+    public void readAdditionalSaveData(CompoundTag compound, CallbackInfo ci) {
         this.setFromBucket(compound.getBoolean("FromBucket"));
     }
 

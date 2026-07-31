@@ -59,7 +59,8 @@ public class VillagerBucket extends MobBucketItem {
             }
         }
 
-        checkExtraContent(player, level, itemStack, blockPos);
+        BlockPos spawnPos = level.getBlockState(blockPos).getCollisionShape(level, blockPos).isEmpty() ? blockPos : blockPos.relative(blockHitResult.getDirection());
+        checkExtraContent(player, level, itemStack, spawnPos);
 
         // TODO: Try make bucket with no nbt make villager type the same as biome spawned in
         player.awardStat(Stats.ITEM_USED.get(this));

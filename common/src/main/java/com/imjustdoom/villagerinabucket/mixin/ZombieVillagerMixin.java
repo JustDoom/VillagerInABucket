@@ -70,15 +70,13 @@ public abstract class ZombieVillagerMixin extends Zombie implements Bucketable, 
         builder.define(FROM_BUCKET, false);
     }
 
-    @Inject(at = @At("HEAD"), method = "addAdditionalSaveData")
+    @Inject(at = @At("TAIL"), method = "addAdditionalSaveData")
     public void addAdditionalSaveData(CompoundTag compound, CallbackInfo ci) {
-        super.addAdditionalSaveData(compound);
         compound.putBoolean("FromBucket", this.fromBucket());
     }
 
-    @Inject(at = @At("HEAD"), method = "readAdditionalSaveData")
+    @Inject(at = @At("TAIL"), method = "readAdditionalSaveData")
     public void readAdditionalSaveData(CompoundTag compound, CallbackInfo ci) {
-        super.readAdditionalSaveData(compound);
         this.setFromBucket(compound.getBoolean("FromBucket"));
     }
 
