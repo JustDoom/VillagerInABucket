@@ -11,11 +11,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.Bucketable;
 import net.minecraft.world.entity.npc.VillagerData;
@@ -118,10 +120,28 @@ public class VillagerBucket extends BucketItem {
     public boolean emptyContents(@Nullable Player player, Level level, BlockPos blockPos, @Nullable BlockHitResult blockHitResult) {
         BlockState blockstate = level.getBlockState(blockPos);
         if (blockstate.isAir() || blockstate.canBeReplaced(Fluids.EMPTY)) {
-            this.playEmptySound(player, level, blockPos);
+            level.playSound(player, blockPos, this.emptySound, SoundSource.NEUTRAL, 1.0F, 1.0F);
             return true;
         } else {
             return false;
+        }
+    }
+
+    @Override
+    public void checkExtraContent(@Nullable Player player, Level level, ItemStack stack, BlockPos pos) {
+        if (level instanceof ServerLevel serverLevel) {
+            Mob mob = this.type.create(serverLevel, EntityType.createDefaultStackConfig(serverLevel, stack, null), pos, EntitySpawnReason.BUCKET, true, false);
+            if (mob instanceof Bucketable bucketable) {
+                CustomData customData = stack.getOrDefault(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY);
+                bucketable.loadFromBucketTag(customData.copyTag());
+                bucketable.setFromBucket(true);
+            }
+
+            if (mob != null) {
+                serverLevel.addFreshEntityWithPassengers(mob);
+                mob.playAmbientSound();
+            }
+            level.gameEvent(player, GameEvent.ENTITY_PLACE, pos);
         }
     }
 
