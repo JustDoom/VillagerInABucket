@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 
-@Mixin(targets = "net/minecraft/core/dispenser/DispenseItemBehavior$17")
+@Mixin(targets = "net/minecraft/core/dispenser/DispenseItemBehavior$7")
 public abstract class DispenseBucketBehaviorMixin {
 
     @Inject(method = "execute", at = @At("HEAD"), cancellable = true)
@@ -50,7 +50,7 @@ public abstract class DispenseBucketBehaviorMixin {
         } else {
             if (blockSource.blockEntity().addItem(remainder) < 0) {
                 Direction direction = blockSource.state().getValue(DispenserBlock.FACING);
-                DefaultDispenseItemBehavior.spawnItem(blockSource.level(), stack, 6, direction, DispenserBlock.getDispensePosition(blockSource));
+                DefaultDispenseItemBehavior.spawnItem(blockSource.level(), remainder, 6, direction, DispenserBlock.getDispensePosition(blockSource));
                 blockSource.level().levelEvent(1000, blockSource.pos(), 0);
                 blockSource.level().levelEvent(2000, blockSource.pos(), direction.get3DDataValue());
             }
