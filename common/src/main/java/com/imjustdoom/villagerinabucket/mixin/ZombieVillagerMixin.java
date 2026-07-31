@@ -52,8 +52,6 @@ public abstract class ZombieVillagerMixin extends Zombie implements Bucketable, 
             return;
         }
 
-        VillagerInABucket.LOGGER.info("Interact");
-
         playSound(getPickupSound(), 1.0F, 1.0F);
         player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, createBucketStack(), false));
         CriteriaTriggers.FILLED_BUCKET.trigger((ServerPlayer) player, getBucketItemStack());
@@ -63,7 +61,6 @@ public abstract class ZombieVillagerMixin extends Zombie implements Bucketable, 
 
     @Override
     public ItemStack createBucketStack() {
-        VillagerInABucket.LOGGER.info("Create bucket");
         ItemStack villagerBucket = getBucketItemStack();
         saveToBucketTag(villagerBucket);
         return villagerBucket;
@@ -72,45 +69,38 @@ public abstract class ZombieVillagerMixin extends Zombie implements Bucketable, 
     @Inject(at = @At("HEAD"), method = "defineSynchedData")
     public void defineSynchedData(SynchedEntityData.Builder builder, CallbackInfo ci) {
         builder.define(FROM_BUCKET, false);
-        VillagerInABucket.LOGGER.info("define sync");
     }
 
     @Inject(at = @At("HEAD"), method = "addAdditionalSaveData")
     public void addAdditionalSaveData(CompoundTag compound, CallbackInfo ci) {
-        VillagerInABucket.LOGGER.info("save additional");
         super.addAdditionalSaveData(compound);
         compound.putBoolean("FromBucket", this.fromBucket());
     }
 
     @Inject(at = @At("HEAD"), method = "readAdditionalSaveData")
     public void readAdditionalSaveData(CompoundTag compound, CallbackInfo ci) {
-        VillagerInABucket.LOGGER.info("read additional");
         super.readAdditionalSaveData(compound);
         this.setFromBucket(compound.getBoolean("FromBucket"));
     }
 
     @Override
     public boolean fromBucket() {
-        VillagerInABucket.LOGGER.info("From bucket");
         return getEntityData().get(FROM_BUCKET);
     }
 
     @Override
     public void setFromBucket(boolean fromBucket) {
-        VillagerInABucket.LOGGER.info("set from bucket");
         getEntityData().set(FROM_BUCKET, fromBucket);
     }
 
     @Override
     public void saveToBucketTag(ItemStack itemStack) {
-        VillagerInABucket.LOGGER.info("save tag");
         CustomData.update(DataComponents.BUCKET_ENTITY_DATA, itemStack, this::addAdditionalSaveData);
         Bucketable.saveDefaultDataToBucketTag(this, itemStack);
     }
 
     @Override
     public void loadFromBucketTag(CompoundTag compoundTag) {
-        VillagerInABucket.LOGGER.info("load tag");
         readAdditionalSaveData(compoundTag);
         Bucketable.loadDefaultDataFromBucketTag(this, compoundTag);
     }
