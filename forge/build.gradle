@@ -21,7 +21,7 @@ dependencies {
     modCompileOnly "maven.modrinth:H1sntfo8:zCzBkn3R"
 
     // Uncomment to test with the Guard Villagers mod
-     modLocalRuntime "maven.modrinth:H1sntfo8:zCzBkn3R"
+    modLocalRuntime "maven.modrinth:H1sntfo8:zCzBkn3R"
 }
 
 architectury {

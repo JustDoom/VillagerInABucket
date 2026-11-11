@@ -91,6 +91,8 @@ public abstract class GuardMixin extends PathfinderMob implements Bucketable, Vi
             }
         }
 
+        tag.putString("type", EntityType.getKey(getType()).toString());
+
         return villagerBucket;
     }
 
@@ -115,6 +117,7 @@ public abstract class GuardMixin extends PathfinderMob implements Bucketable, Vi
     public void loadFromBucketTag(CompoundTag compoundTag) {
         readAdditionalSaveData(compoundTag);
         Bucketable.loadDefaultDataFromBucketTag(this, compoundTag);
+        System.out.println(compoundTag);
     }
 
     @Override

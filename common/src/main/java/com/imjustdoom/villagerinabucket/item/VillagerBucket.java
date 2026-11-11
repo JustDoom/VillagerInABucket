@@ -1,4 +1,4 @@
-package com.imjustdoom.villagerinabucket.item.custom;
+package com.imjustdoom.villagerinabucket.item;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;

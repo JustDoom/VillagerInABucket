@@ -1,6 +1,5 @@
 package com.imjustdoom.villagerinabucket.item;
 
-import com.imjustdoom.villagerinabucket.item.custom.VillagerBucket;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
