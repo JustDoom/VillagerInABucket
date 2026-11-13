@@ -24,38 +24,7 @@ public class VillagerInABucketFabric implements ModInitializer {
     private static final CreativeModeTab VILLAGERINABUCKET_TAB = FabricItemGroup.builder()
             .icon(() -> new ItemStack(ModItems.VILLAGER_IN_A_BUCKET))
             .title(Component.translatable("category.villagerinabucket.villagerinabucket_tab"))
-            .displayItems((params, output) -> {
-                // TODO: Try account for modded villager types and add them to the creative menu (with our default texture)
-
-                output.accept(ModItems.VILLAGER_IN_A_BUCKET);
-
-                ItemStack wanderingStack = new ItemStack(ModItems.VILLAGER_IN_A_BUCKET);
-                CompoundTag wanderingTag = wanderingStack.getOrCreateTag();
-                wanderingTag.putInt("CustomModelData", 5);
-                wanderingTag.putString("id", EntityType.getKey(EntityType.WANDERING_TRADER).toString());
-                output.accept(wanderingStack);
-
-                for (VillagerType type : BuiltInRegistries.VILLAGER_TYPE) {
-                    ItemStack itemStack = new ItemStack(ModItems.VILLAGER_IN_A_BUCKET);
-                    CompoundTag compoundTag = itemStack.getOrCreateTag();
-
-                    if (VillagerInABucket.VILLAGER_DATA_LIST.containsKey(type)) {
-                        compoundTag.putInt("CustomModelData", VillagerInABucket.VILLAGER_DATA_LIST.get(type));
-                    }
-
-                    VillagerData villagerData = new VillagerData(type, VillagerProfession.NONE, 0);
-                    DataResult<Tag> data = VillagerData.CODEC.encodeStart(NbtOps.INSTANCE, villagerData);
-
-                    data.resultOrPartial(s -> System.out.println("Oh no something happened, no idea how or what the consequences are. Contact Villager In A Bucket support though")).ifPresent(tag -> compoundTag.put("VillagerData", tag));
-                    output.accept(itemStack);
-                }
-
-                ItemStack zombieStack = new ItemStack(ModItems.VILLAGER_IN_A_BUCKET);
-                CompoundTag zombieTag = zombieStack.getOrCreateTag();
-                zombieTag.putInt("CustomModelData", 6);
-                zombieTag.putString("id", EntityType.getKey(EntityType.ZOMBIE_VILLAGER).toString());
-                output.accept(zombieStack);
-            })
+            .displayItems((params, output) -> VillagerInABucket.registerCreativeTabItems(output))
             .build();
 
     @Override
