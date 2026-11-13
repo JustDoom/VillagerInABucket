@@ -1,12 +1,12 @@
 package com.imjustdoom.villagerinabucket.mixin;
 
 import com.imjustdoom.villagerinabucket.VillagerBucketable;
+import com.imjustdoom.villagerinabucket.VillagerInABucket;
 import com.imjustdoom.villagerinabucket.config.Config;
 import com.imjustdoom.villagerinabucket.item.ModItems;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -91,17 +91,7 @@ public abstract class VillagerMixin extends AbstractVillager implements Villager
         saveToBucketTag(villagerBucket);
 
         CompoundTag tag = villagerBucket.getOrCreateTag();
-        ResourceLocation resourceLocation = EntityType.getKey(getType());
-        tag.putString("type", resourceLocation.getNamespace() + ":" + resourceLocation.getPath());
-        if (tag.getCompound("VillagerData").contains("type")) {
-            switch (tag.getCompound("VillagerData").getString("type").split(":")[1]) {
-                case "desert" -> tag.putInt("CustomModelData", 1);
-                case "savanna" -> tag.putInt("CustomModelData", 2);
-                case "snow" -> tag.putInt("CustomModelData", 3);
-                case "swamp" -> tag.putInt("CustomModelData", 4);
-            }
-        }
-
+        tag.putInt("CustomModelData", VillagerInABucket.VILLAGER_DATA_LIST.getOrDefault(villagerData.getType(), 0));
         tag.putString("id", EntityType.getKey(getType()).toString());
 
         return villagerBucket;

@@ -6,6 +6,12 @@
   "overrides": [
     {
       "predicate": {
+        "custom_model_data": 0
+      },
+      "model": "villagerinabucket:item/villager_in_a_bucket"
+    },
+    {
+      "predicate": {
         "custom_model_data": 1
       },
       "model": "villagerinabucket:item/desert_villager_in_a_bucket"

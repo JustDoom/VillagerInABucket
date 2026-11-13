@@ -75,7 +75,7 @@ public class VillagerInABucket {
         output.accept(createCreativeItemStack(EntityType.WANDERING_TRADER, 5));
 
         for (VillagerType type : BuiltInRegistries.VILLAGER_TYPE) {
-            ItemStack itemStack = createCreativeItemStack(EntityType.VILLAGER, VillagerInABucket.VILLAGER_DATA_LIST.get(type));
+            ItemStack itemStack = createCreativeItemStack(EntityType.VILLAGER, VillagerInABucket.VILLAGER_DATA_LIST.getOrDefault(type, 0));
 
             VillagerData villagerData = new VillagerData(type, VillagerProfession.NONE, 0);
             VillagerData.CODEC.encodeStart(NbtOps.INSTANCE, villagerData)
@@ -88,10 +88,10 @@ public class VillagerInABucket {
         output.accept(createCreativeItemStack(EntityType.ZOMBIE_VILLAGER, 6));
     }
 
-    private static ItemStack createCreativeItemStack(EntityType<?> entityType, Integer customModelData) {
+    private static ItemStack createCreativeItemStack(EntityType<?> entityType, int customModelData) {
         ItemStack itemStack = new ItemStack(ModItems.VILLAGER_IN_A_BUCKET);
         CompoundTag tag = itemStack.getOrCreateTag();
-        if (customModelData != null) tag.putInt("CustomModelData", customModelData);
+        tag.putInt("CustomModelData", customModelData);
         tag.putString("id", EntityType.getKey(entityType).toString());
         return itemStack;
     }
