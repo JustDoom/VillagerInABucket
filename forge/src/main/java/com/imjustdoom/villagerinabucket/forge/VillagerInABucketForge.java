@@ -8,6 +8,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.npc.VillagerType;
@@ -34,7 +35,12 @@ public class VillagerInABucketForge {
             .icon(() -> new ItemStack(ModItems.VILLAGER_IN_A_BUCKET))
             .displayItems((params, output) -> {
                 output.accept(ModItems.VILLAGER_IN_A_BUCKET);
-                output.accept(ModItems.WANDERING_TRADER_IN_A_BUCKET);
+
+                ItemStack wanderingStack = new ItemStack(ModItems.VILLAGER_IN_A_BUCKET);
+                CompoundTag wanderingTag = wanderingStack.getOrCreateTag();
+                wanderingTag.putInt("CustomModelData", 5);
+                wanderingTag.putString("id", EntityType.getKey(EntityType.WANDERING_TRADER).toString());
+                output.accept(wanderingStack);
 
                 for (VillagerType type : BuiltInRegistries.VILLAGER_TYPE) {
                     ItemStack itemStack = new ItemStack(ModItems.VILLAGER_IN_A_BUCKET);
@@ -51,7 +57,11 @@ public class VillagerInABucketForge {
                     output.accept(itemStack);
                 }
 
-                output.accept(ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET);
+                ItemStack zombieStack = new ItemStack(ModItems.VILLAGER_IN_A_BUCKET);
+                CompoundTag zombieTag = zombieStack.getOrCreateTag();
+                zombieTag.putInt("CustomModelData", 6);
+                zombieTag.putString("id", EntityType.getKey(EntityType.ZOMBIE_VILLAGER).toString());
+                output.accept(zombieStack);
             })
             .build()
     );

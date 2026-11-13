@@ -1,5 +1,6 @@
 package com.imjustdoom.villagerinabucket.item;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
@@ -13,9 +14,10 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.Bucketable;
+import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.MobBucketItem;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -29,10 +31,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
-public class VillagerBucket extends MobBucketItem {
+public class VillagerBucketItem extends BucketItem {
+    // For legacy item types only
+    private final EntityType<? extends Mob> entityType;
 
-    public VillagerBucket(EntityType<?> entityType, SoundEvent soundEvent, Properties properties) {
-        super(entityType, Fluids.EMPTY, soundEvent, properties);
+    public VillagerBucketItem(EntityType<? extends Mob> entityType, Properties properties) {
+        super(Fluids.EMPTY, properties);
+        this.entityType = entityType;
     }
 
     @Override
@@ -48,24 +53,21 @@ public class VillagerBucket extends MobBucketItem {
             return InteractionResultHolder.fail(itemStack);
         }
 
-        BlockPos blockPos1 = level.getBlockState(blockPos).getCollisionShape(level, blockPos).isEmpty() ? blockPos : blockPos.relative(blockHitResult.getDirection());
         if (level instanceof ServerLevel serverLevel) {
-            CompoundTag compoundTag = itemStack.getTag();
-            if (compoundTag == null) {
-                checkExtraContent(player, serverLevel, itemStack, blockPos);
-            } else {
-                Optional<EntityType<?>> optionalEntityType = EntityType.byString(itemStack.getTag().getString("type"));
-                if (optionalEntityType.isPresent()) {
-                    Entity entity = optionalEntityType.get().spawn(serverLevel, itemStack, null, blockPos1, MobSpawnType.BUCKET, true, blockPos != blockPos1 && blockHitResult.getDirection() == Direction.UP);
-                    if (entity instanceof Bucketable bucketable) {
-                        bucketable.loadFromBucketTag(itemStack.getOrCreateTag());
-                        bucketable.setFromBucket(true);
-                    }
-                } else {
-                    checkExtraContent(player, serverLevel, itemStack, blockPos);
+            BlockPos blockPos1 = level.getBlockState(blockPos).getCollisionShape(level, blockPos).isEmpty() ? blockPos : blockPos.relative(blockHitResult.getDirection());
+            // orElse handles if the "id" tag does not exist due to it using old data type
+            EntityType<?> entityType = EntityType.by(itemStack.getOrCreateTag()).orElse(this.entityType);
+
+            // If it somehow ends up not a mob type. That is no longer my problem ¯\_(ツ)_/¯
+            Mob mob = (Mob) entityType.create(serverLevel, itemStack.getTag(), EntityType.createDefaultStackConfig(serverLevel, itemStack, null), blockPos1, MobSpawnType.BUCKET, true, blockPos != blockPos1 && blockHitResult.getDirection() == Direction.UP);
+            if (mob != null) {
+                if (mob instanceof Bucketable bucketable) {
+                    bucketable.loadFromBucketTag(itemStack.getTag());
+                    bucketable.setFromBucket(true);
                 }
-                serverLevel.gameEvent(player, GameEvent.ENTITY_PLACE, blockPos);
+                serverLevel.addFreshEntityWithPassengers(mob);
             }
+            level.gameEvent(player, GameEvent.ENTITY_PLACE, blockPos1);
         }
 
         // TODO: Try make bucket with no nbt make villager type the same as biome spawned in
@@ -74,23 +76,25 @@ public class VillagerBucket extends MobBucketItem {
     }
 
     @Override
+    public Component getName(ItemStack itemStack) {
+        if (itemStack.getTag() == null) return super.getName(itemStack);
+
+        Optional<EntityType<?>> optionalEntityType = EntityType.by(itemStack.getTag());
+        if (optionalEntityType.isEmpty()) return super.getName(itemStack);
+
+        return Component.translatable(optionalEntityType.get().getDescriptionId()).append(Component.translatable("item.villagerinabucket.x_in_a_bucket"));
+    }
+
+    @Override
     public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag) {
         CompoundTag compoundTag = itemStack.getTag();
-        if (compoundTag == null) {
-            return;
-        }
+        if (compoundTag == null) return;
 
         ChatFormatting[] chatFormattings = new ChatFormatting[]{ChatFormatting.ITALIC, ChatFormatting.GRAY};
 
+        if (!compoundTag.contains("VillagerData")) return;
+
         CompoundTag data = compoundTag.getCompound("VillagerData");
-
-        Optional<EntityType<?>> optionalEntityType = EntityType.byString(compoundTag.getString("type"));
-        optionalEntityType.ifPresent(entityType -> {
-            if (entityType != EntityType.VILLAGER) {
-                list.add(Component.translatable("Type: " + I18n.get(entityType.getDescriptionId())).withStyle(chatFormattings));
-            }
-        });
-
         if (data.contains("level")) {
             list.add(Component.translatable("Level: " + data.getInt("level")).withStyle(chatFormattings));
         }

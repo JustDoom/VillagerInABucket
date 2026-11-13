@@ -32,51 +32,44 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.List;
 
 @Mixin(Villager.class)
-public abstract class VillagerMixin extends AbstractVillager implements Bucketable, VillagerBucketable {
-    @Shadow
-    public abstract void releasePoi(MemoryModuleType<GlobalPos> moduleType);
+public abstract class VillagerMixin extends AbstractVillager implements VillagerBucketable {
+    @Shadow public abstract void releasePoi(MemoryModuleType<GlobalPos> memoryModuleType);
+    @Shadow public abstract VillagerData getVillagerData();
+    @Shadow public abstract void setVillagerData(VillagerData villagerData);
+    @Shadow public abstract void onReputationEventFrom(ReputationEventType reputationEventType, Entity entity);
 
-    @Shadow
-    public abstract VillagerData getVillagerData();
-
-    @Shadow
-    public abstract void setVillagerData(VillagerData villagerData);
-
-    @Shadow
-    public abstract void onReputationEventFrom(ReputationEventType type, Entity target);
-
-    @Shadow(remap = false) public abstract void readAdditionalSaveData(CompoundTag arg);
-    @Shadow(remap = false) public abstract void addAdditionalSaveData(CompoundTag arg);
-
-    private static final EntityDataAccessor<Boolean> FROM_BUCKET;
+    @Unique private boolean villagerinabucket$fromBucket;
 
     public VillagerMixin(EntityType<? extends AbstractVillager> entityType, Level level) {
         super(entityType, level);
     }
 
-    @Inject(method = "mobInteract", at = @At("HEAD"), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+    @Inject(method = "mobInteract", at = @At("HEAD"), cancellable = true)
     public void mobInteract(Player player, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResult> cir) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
+
+        // Check if the state is valid for picking up the mob in a bucket
         if (level().isClientSide() || itemStack.getItem() != Items.BUCKET || !isAlive()) {
             return;
         }
 
         playSound(getPickupSound(), 1.0F, 1.0F);
-        if (Config.HARM_REPUTATION) {
-            onReputationEventFrom(ReputationEventType.VILLAGER_HURT, player);
-        }
+        if (Config.HARM_REPUTATION) onReputationEventFrom(ReputationEventType.VILLAGER_HURT, player);
         player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, createBucketStack(), false));
-        CriteriaTriggers.FILLED_BUCKET.trigger((ServerPlayer) player, getBucketItemStack());
+        CriteriaTriggers.FILLED_BUCKET.trigger((ServerPlayer) player, getBucketItemStack()); // Used for achievements tracking
+
         discard();
-        cir.setReturnValue(InteractionResult.sidedSuccess(level().isClientSide()));
+        cir.setReturnValue(InteractionResult.SUCCESS);
     }
 
     @Override
@@ -105,42 +98,50 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
         ResourceLocation resourceLocation = EntityType.getKey(getType());
         tag.putString("type", resourceLocation.getNamespace() + ":" + resourceLocation.getPath());
         if (tag.getCompound("VillagerData").contains("type")) {
-            String type = tag.getCompound("VillagerData").getString("type").split(":")[1];
-            if (type.equals("desert")) {
-                tag.putInt("CustomModelData", 1);
-            } else if (type.equals("savanna")) {
-                tag.putInt("CustomModelData", 2);
-            } else if (type.equals("snow")) {
-                tag.putInt("CustomModelData", 3);
-            } else if (type.equals("swamp")) {
-                tag.putInt("CustomModelData", 4);
+            switch (tag.getCompound("VillagerData").getString("type").split(":")[1]) {
+                case "desert" -> tag.putInt("CustomModelData", 1);
+                case "savanna" -> tag.putInt("CustomModelData", 2);
+                case "snow" -> tag.putInt("CustomModelData", 3);
+                case "swamp" -> tag.putInt("CustomModelData", 4);
             }
         }
+
+        tag.putString("id", EntityType.getKey(getType()).toString());
 
         return villagerBucket;
     }
 
-    @Override
-    public boolean fromBucket() {
-        return getEntityData().get(FROM_BUCKET);
+    @Inject(at = @At("TAIL"), method = "addAdditionalSaveData")
+    public void addAdditionalSaveData(CompoundTag compoundTag, CallbackInfo ci) {
+        // Call "this" because it needs to be calling the methods in THIS file
+        compoundTag.putBoolean("FromBucket", this.fromBucket());
+    }
+
+    @Inject(at = @At("TAIL"), method = "readAdditionalSaveData")
+    public void readAdditionalSaveData(CompoundTag compoundTag, CallbackInfo ci) {
+        this.setFromBucket(compoundTag.getBoolean("FromBucket"));
     }
 
     @Override
-    public void setFromBucket(boolean bl) {
-        // this makes errors, do we need it?
-//        ((Villager)(Object) this).getEntityData().set(FROM_BUCKET, bl);
+    public boolean fromBucket() {
+        return this.villagerinabucket$fromBucket;
+    }
+
+    @Override
+    public void setFromBucket(boolean fromBucket) {
+        this.villagerinabucket$fromBucket = fromBucket;
     }
 
     @Override
     public void saveToBucketTag(ItemStack itemStack) {
-        addAdditionalSaveData(itemStack.getOrCreateTag());
         Bucketable.saveDefaultDataToBucketTag(this, itemStack);
+        addAdditionalSaveData(itemStack.getOrCreateTag());
     }
 
     @Override
     public void loadFromBucketTag(CompoundTag compoundTag) {
-        readAdditionalSaveData(compoundTag);
         Bucketable.loadDefaultDataFromBucketTag(this, compoundTag);
+        readAdditionalSaveData(compoundTag);
     }
 
     @Override
@@ -151,9 +152,5 @@ public abstract class VillagerMixin extends AbstractVillager implements Bucketab
     @Override
     public @NotNull SoundEvent getPickupSound() {
         return SoundEvents.VILLAGER_TRADE;
-    }
-
-    static {
-        FROM_BUCKET = SynchedEntityData.defineId(Villager.class, EntityDataSerializers.BOOLEAN);
     }
 }

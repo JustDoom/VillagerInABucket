@@ -26,77 +26,88 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(WanderingTrader.class)
-public abstract class WanderingTraderMixin extends AbstractVillager implements Bucketable, VillagerBucketable {
-    @Shadow(remap = false) public abstract void readAdditionalSaveData(CompoundTag arg);
-    @Shadow(remap = false) public abstract void addAdditionalSaveData(CompoundTag arg);
-
-    private static final EntityDataAccessor<Boolean> FROM_BUCKET;
+public abstract class WanderingTraderMixin extends AbstractVillager implements VillagerBucketable {
+    @Unique private boolean villagerinabucket$fromBucket;
 
     public WanderingTraderMixin(EntityType<? extends AbstractVillager> entityType, Level level) {
         super(entityType, level);
     }
 
-    @Inject(method = "mobInteract", at = @At("HEAD"), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+    @Inject(method = "mobInteract", at = @At("HEAD"), cancellable = true)
     public void mobInteract(Player player, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResult> cir) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
         if (level().isClientSide() || itemStack.getItem() != Items.BUCKET || !isAlive()) {
             return;
         }
 
+        // TODO: Test if picking up these guys annoys llama's. Because it should if the harm reputation option in enabled
         playSound(getPickupSound(), 1.0F, 1.0F);
         player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, createBucketStack(), false));
         CriteriaTriggers.FILLED_BUCKET.trigger((ServerPlayer) player, getBucketItemStack());
         discard();
-        cir.setReturnValue(InteractionResult.sidedSuccess(level().isClientSide()));
+        cir.setReturnValue(InteractionResult.SUCCESS);
     }
 
     @Override
     public ItemStack createBucketStack() {
         ItemStack villagerBucket = getBucketItemStack();
         saveToBucketTag(villagerBucket);
+
+        CompoundTag tag = villagerBucket.getOrCreateTag();
+        tag.putString("id", EntityType.getKey(getType()).toString());
+        tag.putInt("CustomModelData", 5);
+
         return villagerBucket;
+    }
+
+    @Inject(at = @At("TAIL"), method = "addAdditionalSaveData")
+    public void addAdditionalSaveData(CompoundTag compoundTag, CallbackInfo ci) {
+        // Call "this" because it needs to be calling the methods in THIS file
+        compoundTag.putBoolean("FromBucket", this.fromBucket());
+    }
+
+    @Inject(at = @At("TAIL"), method = "readAdditionalSaveData")
+    public void readAdditionalSaveData(CompoundTag compoundTag, CallbackInfo ci) {
+        this.setFromBucket(compoundTag.getBoolean("FromBucket"));
     }
 
     @Override
     public boolean fromBucket() {
-        return getEntityData().get(FROM_BUCKET);
+        return this.villagerinabucket$fromBucket;
     }
 
     @Override
-    public void setFromBucket(boolean bl) {
-        // this makes errors, do we need it?
-//        ((Villager)(Object) this).getEntityData().set(FROM_BUCKET, bl);
+    public void setFromBucket(boolean fromBucket) {
+        this.villagerinabucket$fromBucket = fromBucket;
     }
 
     @Override
     public void saveToBucketTag(ItemStack itemStack) {
-        addAdditionalSaveData(itemStack.getOrCreateTag());
         Bucketable.saveDefaultDataToBucketTag(this, itemStack);
+        addAdditionalSaveData(itemStack.getOrCreateTag());
     }
 
     @Override
     public void loadFromBucketTag(CompoundTag compoundTag) {
-        readAdditionalSaveData(compoundTag);
         Bucketable.loadDefaultDataFromBucketTag(this, compoundTag);
+        readAdditionalSaveData(compoundTag);
     }
 
     @Override
     public @NotNull ItemStack getBucketItemStack() {
-        return new ItemStack(ModItems.WANDERING_TRADER_IN_A_BUCKET);
+        return new ItemStack(ModItems.VILLAGER_IN_A_BUCKET);
     }
 
     @Override
     public @NotNull SoundEvent getPickupSound() {
         return SoundEvents.WANDERING_TRADER_NO;
-    }
-
-    static {
-        FROM_BUCKET = SynchedEntityData.defineId(Villager.class, EntityDataSerializers.BOOLEAN);
     }
 }
