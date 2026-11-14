@@ -95,7 +95,7 @@ public abstract class WanderingTraderMixin extends AbstractVillager implements V
 
     @Override
     public @NotNull ItemStack getBucketItemStack() {
-        return new ItemStack(ModItems.VILLAGER_IN_A_BUCKET);
+        return new ItemStack(ModItems.WANDERING_TRADER_IN_A_BUCKET);
     }
 
     @Override

@@ -96,7 +96,7 @@ public abstract class ZombieVillagerMixin extends Zombie implements VillagerBuck
 
     @Override
     public @NotNull ItemStack getBucketItemStack() {
-        return new ItemStack(ModItems.VILLAGER_IN_A_BUCKET);
+        return new ItemStack(ModItems.ZOMBIE_VILLAGER_IN_A_BUCKET);
     }
 
     @Override

@@ -131,7 +131,7 @@ public abstract class VillagerMixin extends AbstractVillager implements Villager
 
     @Override
     public @NotNull ItemStack getBucketItemStack() {
-        return new ItemStack(ModItems.VILLAGER_IN_A_BUCKET);
+        return new ItemStack(ModItems.VILLAGER_IN_A_BUCKET); // Only used for the achievement detection so do no change
     }
 
     @Override
