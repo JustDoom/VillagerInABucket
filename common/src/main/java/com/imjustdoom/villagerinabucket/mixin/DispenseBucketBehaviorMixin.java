@@ -26,20 +26,18 @@ public abstract class DispenseBucketBehaviorMixin {
     @Inject(method = "execute", at = @At("HEAD"), cancellable = true)
     private void execute(BlockSource blockSource, ItemStack itemStack, CallbackInfoReturnable<ItemStack> cir) {
         ServerLevel serverLevel = blockSource.getLevel();
-        if (!serverLevel.isClientSide()) {
-            BlockPos blockPos = blockSource.getPos().relative(blockSource.getBlockState().getValue(DispenserBlock.FACING));
-            List<LivingEntity> list = serverLevel.getEntitiesOfClass(LivingEntity.class, new AABB(blockPos), EntitySelector.NO_SPECTATORS);
+        if (serverLevel.isClientSide()) return;
 
-            for (LivingEntity livingEntity : list) {
-                if (!livingEntity.isAlive()) continue;
-                if (livingEntity instanceof VillagerBucketable villager) {
-                    ItemStack stack = villager.createBucketStack();
-                    livingEntity.discard();
+        BlockPos blockPos = blockSource.getPos().relative(blockSource.getBlockState().getValue(DispenserBlock.FACING));
+        List<LivingEntity> list = serverLevel.getEntitiesOfClass(LivingEntity.class, new AABB(blockPos), EntitySelector.NO_SPECTATORS);
 
-                    cir.setReturnValue(villagerinabucket$consume(blockSource, itemStack, stack));
-                    return;
-                }
-            }
+        for (LivingEntity livingEntity : list) {
+            if (!livingEntity.isAlive() || !(livingEntity instanceof VillagerBucketable villager)) continue;
+            ItemStack stack = villager.createBucketStack();
+            livingEntity.discard();
+
+            cir.setReturnValue(villagerinabucket$consume(blockSource, itemStack, stack));
+            return;
         }
     }
 
