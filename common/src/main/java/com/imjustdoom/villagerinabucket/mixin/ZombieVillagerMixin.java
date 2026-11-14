@@ -64,8 +64,7 @@ public abstract class ZombieVillagerMixin extends Zombie implements VillagerBuck
 
     @Inject(at = @At("TAIL"), method = "addAdditionalSaveData")
     public void addAdditionalSaveData(CompoundTag compoundTag, CallbackInfo ci) {
-        // Call "this" because it needs to be calling the methods in THIS file
-        compoundTag.putBoolean("FromBucket", this.fromBucket());
+        compoundTag.putBoolean("FromBucket", fromBucket());
     }
 
     @Inject(at = @At("TAIL"), method = "readAdditionalSaveData")

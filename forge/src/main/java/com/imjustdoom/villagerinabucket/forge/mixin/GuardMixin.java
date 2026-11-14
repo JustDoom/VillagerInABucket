@@ -29,7 +29,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import tallestegg.guardvillagers.entities.Guard;
 
 @Mixin(Guard.class)
@@ -39,15 +38,13 @@ public abstract class GuardMixin extends PathfinderMob implements VillagerBucket
     @Shadow(remap = false) public abstract void readAdditionalSaveData(CompoundTag arg);
     @Shadow(remap = false) public abstract void addAdditionalSaveData(CompoundTag arg);
 
-    @Shadow public abstract String getGuardVariant();
-
     @Unique private boolean villagerinabucket$fromBucket;
 
     public GuardMixin(EntityType<? extends AbstractVillager> entityType, Level level) {
         super(entityType, level);
     }
 
-    @Inject(method = "mobInteract", at = @At("HEAD"), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+    @Inject(method = "mobInteract", at = @At("HEAD"), cancellable = true)
     public void mobInteract(Player player, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResult> cir) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
 
@@ -77,8 +74,7 @@ public abstract class GuardMixin extends PathfinderMob implements VillagerBucket
 
     @Inject(at = @At("TAIL"), method = "addAdditionalSaveData")
     public void addAdditionalSaveData(CompoundTag compound, CallbackInfo ci) {
-        // Call "this" because it needs to be calling the methods in THIS file
-        compound.putBoolean("FromBucket", this.fromBucket());
+        compound.putBoolean("FromBucket", fromBucket());
     }
 
     @Inject(at = @At("TAIL"), method = "readAdditionalSaveData")
