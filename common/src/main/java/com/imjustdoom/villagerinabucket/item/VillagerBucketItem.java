@@ -10,8 +10,12 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.animal.Bucketable;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.VillagerType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
@@ -54,20 +58,24 @@ public class VillagerBucketItem extends BucketItem {
             BlockPos blockPos1 = level.getBlockState(blockPos).getCollisionShape(level, blockPos).isEmpty() ? blockPos : blockPos.relative(blockHitResult.getDirection());
             // orElse handles if the "id" tag does not exist due to it using old data type
             EntityType<?> entityType = EntityType.by(itemStack.getOrCreateTag()).orElse(this.entityType);
+            CompoundTag tag = itemStack.getOrCreateTag();
 
             // If it somehow ends up not a mob type. That is no longer my problem ¯\_(ツ)_/¯
-            Mob mob = (Mob) entityType.create(serverLevel, itemStack.getTag(), EntityType.createDefaultStackConfig(serverLevel, itemStack, null), blockPos1, MobSpawnType.BUCKET, true, blockPos != blockPos1 && blockHitResult.getDirection() == Direction.UP);
-            if (mob != null) {
-                if (mob instanceof Bucketable bucketable) {
-                    bucketable.loadFromBucketTag(itemStack.getTag());
-                    bucketable.setFromBucket(true);
+            Mob mob = (Mob) entityType.create(serverLevel, tag, EntityType.createDefaultStackConfig(serverLevel, itemStack, null), blockPos1, MobSpawnType.BUCKET, true, blockPos != blockPos1 && blockHitResult.getDirection() == Direction.UP);
+            if (mob instanceof Bucketable bucketable) {
+                bucketable.loadFromBucketTag(itemStack.getTag());
+                bucketable.setFromBucket(true);
+
+                // If the bucket has no data it will read the biome of the place location like a spawn egg does
+                if (mob instanceof Villager villager && !tag.contains("VillagerData", 10)) {
+                    villager.setVillagerData(villager.getVillagerData().setType(VillagerType.byBiome(serverLevel.getBiome(blockPos1))));
                 }
+
                 serverLevel.addFreshEntityWithPassengers(mob);
             }
             level.gameEvent(player, GameEvent.ENTITY_PLACE, blockPos1);
         }
 
-        // TODO: Try make bucket with no nbt make villager type the same as biome spawned in
         player.awardStat(Stats.ITEM_USED.get(this));
         return InteractionResultHolder.sidedSuccess(getEmptySuccessItem(itemStack, player), level.isClientSide());
     }
