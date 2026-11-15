@@ -26,7 +26,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(ZombieVillager.class)
 public abstract class ZombieVillagerMixin extends Zombie implements VillagerBucketable {
@@ -36,10 +35,15 @@ public abstract class ZombieVillagerMixin extends Zombie implements VillagerBuck
         super(entityType, level);
     }
 
-    @Inject(method = "mobInteract", at = @At("HEAD"), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
+    @Inject(method = "mobInteract", at = @At("HEAD"), cancellable = true)
     public void mobInteract(Player player, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResult> cir) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
-        if (level().isClientSide() || itemStack.getItem() != Items.BUCKET || !isAlive() || !Config.ZOMBIE_VILLAGER) {
+        if (itemStack.getItem() != Items.BUCKET || !isAlive() || !Config.ZOMBIE_VILLAGER) {
+            return;
+        }
+
+        if (level().isClientSide()) {
+            cir.setReturnValue(InteractionResult.SUCCESS);
             return;
         }
 
@@ -102,5 +106,10 @@ public abstract class ZombieVillagerMixin extends Zombie implements VillagerBuck
     @Override
     public @NotNull SoundEvent getPickupSound() {
         return SoundEvents.ZOMBIE_VILLAGER_AMBIENT;
+    }
+
+    @Override
+    public float getPickRadius() {
+        return 0.5F;
     }
 }

@@ -55,7 +55,12 @@ public abstract class VillagerMixin extends AbstractVillager implements Villager
         ItemStack itemStack = player.getItemInHand(interactionHand);
 
         // Check if the state is valid for picking up the mob in a bucket
-        if (level().isClientSide() || itemStack.getItem() != Items.BUCKET || !isAlive()) {
+        if (itemStack.getItem() != Items.BUCKET || !isAlive()) {
+            return;
+        }
+
+        if (level().isClientSide()) {
+            cir.setReturnValue(InteractionResult.SUCCESS);
             return;
         }
 

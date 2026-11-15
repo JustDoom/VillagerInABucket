@@ -37,7 +37,12 @@ public abstract class WanderingTraderMixin extends AbstractVillager implements V
     @Inject(method = "mobInteract", at = @At("HEAD"), cancellable = true)
     public void mobInteract(Player player, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResult> cir) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
-        if (level().isClientSide() || itemStack.getItem() != Items.BUCKET || !isAlive()) {
+        if (itemStack.getItem() != Items.BUCKET || !isAlive()) {
+            return;
+        }
+
+        if (level().isClientSide()) {
+            cir.setReturnValue(InteractionResult.SUCCESS);
             return;
         }
 
