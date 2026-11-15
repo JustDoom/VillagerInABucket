@@ -1,6 +1,5 @@
-package com.imjustdoom.villagerinabucket.fabric;
+package com.imjustdoom.villagerinabucket;
 
-import com.imjustdoom.villagerinabucket.VillagerInABucket;
 import com.imjustdoom.villagerinabucket.item.ModItems;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;

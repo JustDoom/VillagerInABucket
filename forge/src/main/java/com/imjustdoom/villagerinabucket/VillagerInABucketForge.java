@@ -1,6 +1,5 @@
-package com.imjustdoom.villagerinabucket.forge;
+package com.imjustdoom.villagerinabucket;
 
-import com.imjustdoom.villagerinabucket.VillagerInABucket;
 import com.imjustdoom.villagerinabucket.item.ModItems;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;

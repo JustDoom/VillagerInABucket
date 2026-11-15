@@ -1,33 +1,29 @@
 modLoader = "javafml"
-loaderVersion = "[47,)"
-issueTrackerURL = "https://github.com/JustDoom/VillagerInABucket/issues"
-license = "MIT"
-
-[[mods]]
-modId = "villagerinabucket"
+loaderVersion = "${forge_loader_version_range}"
+license = "${license}"
+issueTrackerURL="https://github.com/JustDoom/VillagerInABucket/issues"
+[[mods]] #mandatory
+modId = "${mod_id}"
 version = "${version}"
-displayName = "Villager In A Bucket"
-authors = "JustDoom"
-description = '''
-Pick them up in a bucket
-'''
+displayName = "${mod_name}"
+displayURL="https://github.com/JustDoom/VillagerInABucket"
 logoFile = "logo.png"
-
-[[dependencies.villagerinabucket]]
+credits = "${credits}"
+authors = "${mod_author}"
+description = '''${description}'''
+[[dependencies.${mod_id}]]
 modId = "forge"
 mandatory = true
-versionRange = "[47,)"
+versionRange = "[${forge_version},)"
 ordering = "NONE"
 side = "BOTH"
-
-[[dependencies.villagerinabucket]]
+[[dependencies.${mod_id}]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.20.1,)"
+versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "BOTH"
-
-[[dependencies.villagerinabucket]]
+[[dependencies.${mod_id}]]
 modId="guardvillagers"
 mandatory=false
 versionRange="[1.20.1-1.6,)"

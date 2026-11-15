@@ -5,25 +5,28 @@
   "name": "Villager In A Bucket",
   "description": "Pick them up in a bucket",
   "authors": [
-    "JustDoom"
+    "JustDoom",
+    "SlyFox (Artist)"
   ],
   "contact": {
     "sources": "https://github.com/JustDoom/VillagerInABucket",
     "issues": "https://github.com/JustDoom/VillagerInABucket/issues"
   },
-  "license": "MIT",
-  "icon": "logo.png",
+  "license": "${license}",
+  "icon": "assets/villagerinabucket/${mod_id}.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.imjustdoom.villagerinabucket.fabric.VillagerInABucketFabric"
+      "com.imjustdoom.villagerinabucket.VillagerInABucketFabric"
     ]
   },
   "mixins": [
-    "villagerinabucket-common.mixins.json"
+    "${mod_id}-common.mixins.json"
   ],
   "depends": {
+    "fabricloader": ">=0.14",
     "fabric": "*",
-    "minecraft": ["1.20.1"]
+    "minecraft": "${minecraft_version}",
+    "java": ">=17"
   }
 }

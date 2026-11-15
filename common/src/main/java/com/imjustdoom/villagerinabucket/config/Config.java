@@ -1,6 +1,6 @@
 package com.imjustdoom.villagerinabucket.config;
 
-import dev.architectury.injectables.annotations.ExpectPlatform;
+import com.imjustdoom.villagerinabucket.platform.Services;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,7 +20,7 @@ public class Config {
 
     public static void init() throws IOException {
         PROPERTIES = new Properties();
-        FILE_PATH = Path.of(getConfigDirectory() + "/villager-in-a-bucket.properties");
+        FILE_PATH = Path.of(Services.PLATFORM.getConfigDirectory() + "/villager-in-a-bucket.properties");
         if (!FILE_PATH.toFile().exists()) {
             new File(FILE_PATH.toString()).createNewFile();
         }
@@ -84,10 +84,5 @@ public class Config {
                         'enable-zombie-villager' should the ability to pick up Zombie Villagers in buckets be enabled. Default true
                         'harm-reputation' controls whether the reputation of the picked up villager should be harmed (Equal to punching it). Default false
                         """);
-    }
-
-    @ExpectPlatform
-    public static Path getConfigDirectory() {
-        throw new AssertionError();
     }
 }
