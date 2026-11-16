@@ -56,7 +56,7 @@ public abstract class ZombieVillagerMixin extends Zombie implements VillagerBuck
 
     @Override
     public ItemStack createBucketStack() {
-        ItemStack villagerBucket = getBucketItemStack();
+        ItemStack villagerBucket = new ItemStack(ModItems.VILLAGER_IN_A_BUCKET);
         saveToBucketTag(villagerBucket);
 
         CompoundTag tag = villagerBucket.getOrCreateTag();
